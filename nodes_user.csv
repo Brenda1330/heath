@@ -1,0 +1,3 @@
+user_id,username,email,role,created_at,last_login,status
+U001,kristen,kristen@example.com,doctor,2024-01-01,2025-04-17T10:00:00,active
+U002,admin01,admin@example.com,admin,2023-10-15,2025-04-17T09:00:00,active
