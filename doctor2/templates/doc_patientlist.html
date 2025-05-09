@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1b1f3a, #2c3553);
+            color: white;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 30px 20px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: background 0.3s ease, padding-left 0.3s ease;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        }
+
+        .sidebar .nav-link i {
+        margin-right: 10px;
+        }
+
+        .sidebar .nav-link i.fas.fa-chevron-down {
+            margin-left: 20px;
+        }
+
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding-left: 25px;
+        color: #fff;
+        text-decoration: none;
+        }
+
+        .sidebar-header h4 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .report-link {
+            display: flex;
+            align-items: center; /* Center the icon and text vertically */
+            margin-left: 5px;
+        }
+
+        .report-text {
+            margin-left: 5px; 
+        }
+
+        .dashboard-header {
+            margin-left: 270px; 
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header .d-flex {
+            box-shadow: none; /* Remove shadow from search bar and sort dropdown */
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 10px; /* Added margin */
+        }
+
+        .table-container {
+            margin-left: 270px; /* Adjusted for fixed sidebar */
+            padding: 20px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Common styles for all status boxes */
+        .status-box {
+            display: inline-block;
+            padding: 8px 18px;  /* Adjust padding for a bit larger box */
+            font-weight: bold;
+            color: white;
+            border-radius: 10px;  /* More rounded corners for a smooth look */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Subtle shadow for a 3D effect */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;  /* Smooth transition */
+        }
+
+        /* Specific styles for different statuses */
+        .status-box.critical {
+            background-color: #FF4C4C;  /* Highlighter Red */
+        }
+
+        .status-box.warning {
+            background-color: #FFEB3B;  /* Highlighter Yellow */
+        }
+
+        .status-box.stable {
+            background-color: #03ff4f;  /* Highlighter Green */
+            color: #333;
+        }
+
+        .status-box.recovered {
+            background-color: #29B6F6;  /* Highlighter Blue */
+        }
+
+        /* Hover effect */
+        .status-box:hover {
+            transform: scale(1.1);  /* Slightly enlarge the box */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  /* Deeper shadow on hover */
+        }
+
+        
+        .table {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        /* Gradient effect on hover for rows */
+        .table tbody tr {
+        transition: background-color 0.3s ease, transform 0.5s ease;
+        }
+
+        .table tbody tr:hover {
+        background: linear-gradient(90deg, #a988cc 0%, #a6c6fc 100%);
+        transform: translateX(5px);
+        }
+
+        /* Slide-in animation for rows */
+        .table tbody tr {
+        opacity: 0;
+        transform: translateX(-100px);
+        animation: slideIn 0.5s forwards;
+        }
+
+        @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        }
+
+        /* Glow and shadow effect on cell hover */
+        .table td, .table th {
+        padding: 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+        }
+
+        .table td:hover, .table th:hover {
+        box-shadow: 0 0 10px rgba(78, 115, 223, 0.6);
+        text-shadow: 0 0 8px rgba(78, 115, 223, 0.8);
+        }
+
+        .sorting-btn {
+            background-color: #f8f9fa; /* Lighter grey */
+            padding: 8px 12px; /* Adjusted padding */
+            cursor: pointer;
+            border: 1px solid #dee2e6; /* Added border */
+            font-size: 14px;
+            text-align: center;
+            border-radius: .25rem; /* Added border-radius */
+        }
+        
+        /* Remove the triangle arrow at the right of the button */
+        #sortMenu::after {
+            display: none !important;
+        }
+
+        .sorting-btn:hover {
+            background-color: #e1e1e1;
+        }
+
+        .dashboard-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* Added margin */
+        }
+
+        /* Style for sort direction indicators */
+        .sort-indicator {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .sort-asc {
+            border-bottom: 5px solid #555;
+        }
+        .sort-desc {
+            border-top: 5px solid #555;
+        }
+
+        .profile-dropdown .dropdown-toggle {
+            background-color: transparent;
+            border: none;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .profile-dropdown .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header text-center">
+        <h4><i class="fas fa-stethoscope me-2"></i> Doctor Panel</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="doc_dashboard.html" class="nav-link"><i class="fas fa-th-large me-2"></i><span> Dashboard</span></a></li>
+        <li class="nav-item"><a href="doc_addpatient.html" class="nav-link"><i class="fas fa-user-plus me-2"></i><span> Add Patient</span></a></li>
+        <li class="nav-item"><a href="doc_patientlist.html" class="nav-link active"><i class="fas fa-users"></i><span> Patient List</span></a></li>
+        <li class="nav-item"><a href="#patientSubmenu" class="nav-link" data-bs-toggle="collapse"><i class="fas fa-syringe"></i><span> Patient</span><i class="fas fa-chevron-down float-end"></i></a></li>
+    <div class="collapse" id="patientSubmenu">
+        <li class="nav-item"><a href="doc_importdata.html" class="nav-link"><i class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a></li>
+        <li class="nav-item"><a href="doc_recommendation.html" class="nav-link"><i class="fas fa-bolt"></i><span> Recommendation</span></a></li>
+        <li class="nav-item"><a href="doc_graphexp.html" class="nav-link"><i class="fas fa-chart-line"></i><span> Graph Explorer</span></a></li>
+        <li class="nav-item"><a href="doc_algorithm.html" class="nav-link"><i class="fas fa-cogs"></i><span> Algorithm Runner</span></a></li>
+    </div>
+    <li class="nav-item"><a href="doc_reports.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span> Reports</span></a></li>
+    <li class="nav-item"><a href="doc_userprofile.html" class="nav-link"><i class="fas fa-user-circle"></i><span> View Profile</span></a></li>
+</div>
+
+<!-- Profile Dropdown (Top Right) -->
+<div class="profile-dropdown position-absolute" style="top: 10px; right: 30px;">
+  <div class="dropdown">
+    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-user-circle"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="doc_userprofile.html">View Profile</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-header">
+    <div class="dashboard-header d-flex justify-content-end align-items-center">
+        <input type="text" id="searchInput" placeholder="Search by Name or Status..." class="form-control w-50 me-2" onkeyup="searchFunction()">
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle sorting-btn" type="button" id="sortMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                Sort by: Default <span id="sortIndicator" class="sort-indicator"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="sortMenu">
+                <!-- Corrected onclick indices based on table columns -->
+                <li><a class="dropdown-item" href="#" onclick="sortTable(0, this)">User Name</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(1, this)">Age</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(4, this)">Last Created</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(5, this)">Status</a></li>
+            </ul>
+        </div>
+    </div>
+    <h1>All Patients</h1>
+</div>
+
+<div class="table-container">
+    <table class="table table-bordered" id="patientTable">
+        <thead>
+            <tr>
+                <th data-column="0">User Name</th>
+                <th data-column="1">Date of Birth</th>
+                <th data-column="2">Gender</th>
+                <th data-column="3">Status</th>
+                <th data-column="4">Last Created</th>
+                <th data-column="4">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.full_name }}</td>
+                <td>{{ patient.dob }}</td>
+                <td>{{ patient.gender }}</td>
+                <!-- Dynamically add class based on status -->
+                <td><span class="status-box {{ patient.status | lower }}">{{ patient.status }}</span></td>  <!-- Status box -->
+                <td>{{ patient.last_created }}</td>                
+                <td><a href="{{ url_for('patient_detail', patient_id=patient.patient_id) }}" class="btn btn-primary">View Details</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Search Functionality (Improved to search across more relevant fields)
+function searchFunction() {
+    let input = document.getElementById('searchInput');
+    let filter = input.value.toUpperCase().trim();
+    let table = document.getElementById('patientTable');
+    let tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+        let tdName = tr[i].getElementsByTagName('td')[0]; // User Name
+        let tdStatus = tr[i].getElementsByTagName('td')[3]; // Corrected Status column index
+
+        let nameText = tdName ? tdName.textContent || tdName.innerText : '';
+        let statusText = tdStatus ? tdStatus.textContent || tdStatus.innerText : '';
+
+        if (nameText.toUpperCase().indexOf(filter) > -1 ||
+            statusText.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = ""; // Show row
+        } else {
+            tr[i].style.display = "none"; // Hide row
+        }
+    }
+}
+
+// Sorting Functionality (Correct Column Indices for Status)
+// Sorting Functionality (Correct Column Indices for Status and other columns)
+const statusOrder = {
+    'critical': 4,
+    'warning': 3,
+    'stable': 2,
+    'recovered': 1
+};
+
+let currentSortColumn = -1;
+let currentSortDirection = 'desc'; // 'asc' or 'desc'
+
+function sortTable(columnIndex, clickedElement) {
+    const table = document.getElementById('patientTable');
+    const tbody = table.tBodies[0];
+    const rows = Array.from(tbody.rows);
+    const sortButton = document.getElementById('sortMenu');
+    const sortIndicator = document.getElementById('sortIndicator');
+
+    // Determine sort direction
+    let direction = currentSortColumn === columnIndex ? (currentSortDirection === 'asc' ? 'desc' : 'asc') : 'desc';
+    currentSortColumn = columnIndex;
+    currentSortDirection = direction;
+
+    // Update the sort button label
+    const columnName = clickedElement ? clickedElement.textContent : table.tHead.rows[0].cells[columnIndex].textContent;
+    sortButton.childNodes[0].nodeValue = `Sort by: ${columnName} `;
+    sortIndicator.className = `sort-indicator ${direction === 'asc' ? 'sort-asc' : 'sort-desc'}`;
+
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.cells[columnIndex];
+        const cellB = rowB.cells[columnIndex];
+        let valA = cellA.textContent || cellA.innerText;
+        let valB = cellB.textContent || cellB.innerText;
+
+        // Handle sorting logic based on column type
+        switch (columnIndex) {
+            case 1: // Date of Birth
+                valA = new Date(valA);
+                valB = new Date(valB);
+                break;
+            case 3: // Status (Column Index for Status)
+                valA = statusOrder[valA.trim().toLowerCase()] || 0;
+                valB = statusOrder[valB.trim().toLowerCase()] || 0;
+                break;
+            case 0: // User Name (String)
+            case 2: // Gender (String)
+                valA = valA.toLowerCase();
+                valB = valB.toLowerCase();
+                break;
+            case 4: // Last Created (Date)
+                valA = new Date(valA);
+                valB = new Date(valB);
+                break;
+        }
+
+        let comparison = 0;
+        if (valA > valB) comparison = 1;
+        else if (valA < valB) comparison = -1;
+
+        return direction === 'asc' ? comparison : (comparison * -1); // Apply direction
+    });
+
+    // Re-append sorted rows
+    while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Initialize the page with descending sort by Status
+window.onload = function() {
+    sortTable(3, document.querySelector('a[onclick="sortTable(3, this)"]')); // Correct column index for Status (3)
+};
+
+// Toggle Patient List submenu
+document.getElementById("patientListLink").addEventListener("click", function (e) {
+            e.preventDefault();
+            const group = document.querySelector(".sidebar-link-group");
+            group.style.display = group.style.display === "block" ? "none" : "block";
+        });
+
+    // Add this JavaScript to handle the 'active' class toggle
+    const links = document.querySelectorAll('.sidebar a');
+
+    links.forEach(link => {
+        link.addEventListener('click', function() {
+            links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+            this.classList.add('active'); // Add active class to clicked link
+        });
+    });
+
+</script>
+
+</body>
+</html>
