@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1b1f3a, #2c3553);
+            color: white;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 30px 20px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: background 0.3s ease, padding-left 0.3s ease;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        }
+
+        .sidebar .nav-link i {
+        margin-right: 10px;
+        }
+
+        .sidebar .nav-link i.fas.fa-chevron-down {
+            margin-left: 20px;
+        }
+
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding-left: 25px;
+        color: #fff;
+        text-decoration: none;
+        }
+
+        .sidebar-header h4 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .report-link {
+            display: flex;
+            align-items: center; /* Center the icon and text vertically */
+            margin-left: 5px;
+        }
+
+        .report-text {
+            margin-left: 5px; 
+        }
+
+        .dashboard-header {
+            margin-left: 270px; 
+            margin-top: 50px;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header .d-flex {
+            box-shadow: none; /* Remove shadow from search bar and sort dropdown */
+        }
+
+        .dashboard-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-top: 20px; /* Added margin */
+        }
+
+        /* Table Styling */
+        .table-container {
+            margin-left: 270px;
+            padding: 20px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            /* Remove explicit borders if you rely on .table-bordered */
+            /* border: 1px solid #ddd; */ /* Removed from original, add back if needed without .table-bordered */
+        }
+
+        /* Make sure TH background isn't overridden if desired */
+        .table th {
+            background-color: #f4f4f4; /* Keep or adjust as needed */
+            color: #333;
+            font-weight: bold;
+            /* border: 1px solid #ddd; */ /* Removed from original, add back if needed without .table-bordered */
+        }
+
+
+        /* Common styles for all status boxes */
+        .status-box {
+            display: inline-block;
+            padding: 8px 18px;  /* Adjust padding for a bit larger box */
+            font-weight: bold;
+            color: white; /* Text color is white for most */
+            border-radius: 10px;  /* More rounded corners for a smooth look */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Subtle shadow for a 3D effect */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;  /* Smooth transition */
+            min-width: 100px; /* Optional: Ensure boxes have a minimum width */
+        }
+
+        /* Specific styles for different statuses */
+        .status-box.critical {
+            background-color: #FF4C4C;  /* Highlighter Red */
+        }
+
+        .status-box.warning {
+            background-color: #FFEB3B;  /* Highlighter Yellow */
+            color: #333; /* Darker text for yellow background */
+        }
+
+        .status-box.stable {
+            background-color: #03ff4f;  /* Highlighter Green */
+            color: #333;
+        }
+
+        .status-box.recovered {
+            background-color: #29B6F6;  /* Highlighter Blue */
+        }
+
+        /* Hover effect */
+        .status-box:hover {
+            transform: scale(1.05);  /* Slightly enlarge the box (less jumpy than 1.1) */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  /* Deeper shadow on hover */
+        }
+
+        .table {
+      background-color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    /* Gradient effect on hover for rows */
+    .table tbody tr {
+      transition: background-color 0.3s ease, transform 0.5s ease;
+    }
+
+    .table tbody tr:hover {
+      background: linear-gradient(90deg, #a988cc 0%, #a6c6fc 100%);
+      transform: translateX(5px);
+    }
+
+    /* Slide-in animation for rows */
+    .table tbody tr {
+      opacity: 0;
+      transform: translateX(-100px);
+      animation: slideIn 0.5s forwards;
+    }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Glow and shadow effect on cell hover */
+    .table td, .table th {
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .table td:hover, .table th:hover {
+      box-shadow: 0 0 10px rgba(78, 115, 223, 0.6);
+      text-shadow: 0 0 8px rgba(78, 115, 223, 0.8);
+    }
+
+        .sorting-btn {
+            background-color: #f8f9fa; /* Lighter grey */
+            padding: 8px 12px; /* Adjusted padding */
+            cursor: pointer;
+            border: 1px solid #dee2e6; /* Added border */
+            font-size: 14px;
+            text-align: center;
+            border-radius: .25rem; /* Added border-radius */
+        }
+
+        .sorting-btn:hover {
+            background-color: #e9ecef; /* Slightly darker hover */
+        }
+
+        .dashboard-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* Added margin */
+        }
+
+        .profile-dropdown .dropdown-toggle {
+            background-color: transparent;
+            border: none;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .profile-dropdown .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header text-center">
+        <h4><i class="fas fa-stethoscope me-2"></i> Doctor Panel</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="doc_dashboard.html" class="nav-link active"><i class="fas fa-th-large me-2"></i><span> Dashboard</span></a></li>
+        <li class="nav-item"><a href="doc_addpatient.html" class="nav-link"><i class="fas fa-user-plus me-2"></i><span> Add Patient</span></a></li>
+        <li class="nav-item"><a href="doc_patientlist.html" class="nav-link"><i class="fas fa-users"></i><span> Patient List</span></a></li>
+        <li class="nav-item"><a href="#patientSubmenu" class="nav-link" data-bs-toggle="collapse"><i class="fas fa-syringe"></i><span>Patient </span><i class="fas fa-chevron-down float-end"></i></a></li>
+    <div class="collapse" id="patientSubmenu">
+        <li class="nav-item"><a href="doc_importdata.html" class="nav-link"><i class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a></li>
+        <li class="nav-item"><a href="doc_recommendation.html" class="nav-link"><i class="fas fa-bolt"></i><span> Recommendation</span></a></li>
+        <li class="nav-item"><a href="doc_graphexp.html" class="nav-link"><i class="fas fa-chart-line"></i><span> Graph Explorer</span></a></li>
+        <li class="nav-item"><a href="doc_algorithm.html" class="nav-link"><i class="fas fa-cogs"></i><span> Algorithm Runner</span></a></li>
+    </div>
+    <li class="nav-item"><a href="doc_reports.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span> Reports</span></a></li>
+    <li class="nav-item"><a href="doc_userprofile.html" class="nav-link"><i class="fas fa-user-circle"></i><span> View Profile</span></a></li>
+    <p>Welcome, {{ doctor['username'] }}</p>  <!-- Display doctor's name -->
+</div>
+
+<!-- Profile Dropdown (Top Right) -->
+<div class="profile-dropdown position-absolute" style="top: 10px; right: 30px;">
+  <div class="dropdown">
+    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-user-circle"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="doc_userprofile.html">View Profile</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="dashboard-header">
+    <div class="dashboard-header d-flex justify-content-end align-items-center">
+        <!-- Search Bar -->
+        <input type="text" id="searchInput" placeholder="Search by Name, Status, Last Updated..." class="form-control w-50 me-2" onkeyup="searchFunction()">
+    
+        <!-- Sort Dropdown -->
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle sorting-btn" type="button" id="sortMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                Sort by: Default
+                <span id="sortIndicator" class="sort-indicator"></span> <!-- Sorting Indicator -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="sortMenu">
+                <!-- Sorting columns and updating button text -->
+                <li><a class="dropdown-item" href="#" onclick="sortTable(0, 'Patient Name'); return false;">Patient Name</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(1, 'CGM Level'); return false;">CGM Level</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(2, 'Status'); return false;">Status</a></li>
+                <li><a class="dropdown-item" href="#" onclick="sortTable(3, 'Last Updated'); return false;">Last Updated</a></li>
+            </ul>
+        </div>
+    </div>
+    <h1>Patient Summary</h1>
+</div>
+
+<!-- Patient Data Table -->
+<div class="table-container"> <!-- Good practice to wrap the table -->
+    <table id="patientTable" class="table table-bordered"> <!-- Added table-bordered for consistent styling -->
+        <thead>
+            <tr>
+                <!-- Corrected Headers to match data and sorting intentions -->
+                <th>Patient Name</th> <!-- Index 0 -->
+                <th>CGM Level</th>   <!-- Index 1 -->
+                <th>Status</th>       <!-- Index 2 -->
+                <th>Last Updated</th> <!-- Index 3 -->
+                <!-- Removed Age header as data isn't shown -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+                {# Determine the CSS class based on the status (lowercase for reliability) #}
+                {% set status_lower = patient['status'] | lower if patient['status'] else 'unknown' %} {# Handle potential null status #}
+
+                <tr>
+                    <td>{{ patient['full_name'] or 'N/A' }}</td>
+                    <td>{{ patient['cgm_level'] or 'N/A' }}</td>
+
+                    {# Wrap status in a span with classes #}
+                    <td>
+                        {% if patient['status'] %}
+                            <span class="status-box {{ status_lower }}">{{ patient['status'] }}</span>
+                        {% else %}
+                            <span class="status-box unknown">Unknown</span> {# Style for unknown status #}
+                        {% endif %}
+                    </td>
+
+                    <td>{{ patient['last_updated'] or 'N/A' }}</td>
+                </tr>
+            {% endfor %}
+            {% if not patients %}
+                <tr>
+                    <td colspan="4" class="text-center">No patient data available.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Search Functionality 
+function searchFunction() {
+    let input = document.getElementById('searchInput');
+    let filter = input.value.toUpperCase();
+    let table = document.getElementById('patientTable');
+    let tbody = table.getElementsByTagName('tbody')[0];
+    let tr = tbody.getElementsByTagName('tr');
+
+    for (let i = 0; i < tr.length; i++) {
+        let tdName = tr[i].getElementsByTagName('td')[0];
+        let tdGlucose = tr[i].getElementsByTagName('td')[2];
+        let tdAlert = tr[i].getElementsByTagName('td')[3];
+
+        if (tdName || tdGlucose || tdAlert) {
+            let nameText = tdName.textContent || tdName.innerText;
+            let glucoseText = tdGlucose.textContent || tdGlucose.innerText;
+            let alertText = tdAlert.textContent || tdAlert.innerText;
+
+            if (nameText.toUpperCase().indexOf(filter) > -1 ||
+                glucoseText.toUpperCase().indexOf(filter) > -1 ||
+                alertText.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+
+let currentSortColumn = -1;
+let currentSortDirection = 'desc'; // Default to descending for Status
+
+// Custom sorting order for Status (Higher number = higher priority)
+const statusOrder = {
+    'critical': 4, // Changed from 'Critical' to lowercase
+    'warning': 3,  // Changed from 'Warning' to lowercase
+    'stable': 2,   // Changed from 'Stable' to lowercase
+    'recovered': 1,// Changed from 'Recovered' to lowercase
+    'unknown': 0   // Handle unknown/default case
+};
+
+// Sorting Functionality
+function sortTable(columnIndex, columnName) { // Pass columnName directly
+    const table = document.getElementById('patientTable');
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.rows);
+    const sortButton = document.getElementById('sortMenu');
+    const sortIndicator = document.getElementById('sortIndicator');
+
+    // Handle "No patient data" row
+    if (rows.length === 1 && rows[0].getElementsByTagName('td').length === 1 && rows[0].getElementsByTagName('td')[0].getAttribute('colspan') === "4") {
+        // Update button text but don't sort
+        sortButton.childNodes[0].nodeValue = `Sort by: ${columnName} `;
+        sortIndicator.className = 'sort-indicator'; // Clear indicator
+        return;
+    }
+
+
+    // Determine sort direction
+    let direction = 'desc'; // Default direction
+    if (currentSortColumn === columnIndex) {
+        direction = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        // Default direction based on column
+        if (columnIndex === 2) { // Default Status to descending (Critical first)
+            direction = 'desc';
+        } else if (columnIndex === 3) { // Default Last Updated to descending (Newest first)
+             direction = 'desc';
+        }
+        else { // Default others to ascending
+            direction = 'asc';
+        }
+    }
+
+    currentSortColumn = columnIndex;
+    currentSortDirection = direction;
+
+    // Update the sort button label
+    sortButton.childNodes[0].nodeValue = `Sort by: ${columnName} `; // Use nodeValue to target the text node
+
+    // Update sort indicator
+    sortIndicator.className = `sort-indicator ${direction === 'asc' ? 'sort-asc' : 'sort-desc'}`;
+
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.cells[columnIndex];
+        const cellB = rowB.cells[columnIndex];
+        let valA, valB;
+
+        // Handle sorting logic based on column type
+        switch (columnIndex) {
+            case 0: // Patient Name (String)
+                valA = (cellA.textContent || cellA.innerText || "").trim().toLowerCase();
+                valB = (cellB.textContent || cellB.innerText || "").trim().toLowerCase();
+                break;
+            case 1: // CGM Level (Number)
+                valA = parseFloat((cellA.textContent || cellA.innerText).match(/[\d\.]+/)?.[0]) || 0;
+                valB = parseFloat((cellB.textContent || cellB.innerText).match(/[\d\.]+/)?.[0]) || 0;
+                break;
+            case 2: // Status (Custom Order) - **FIXED**
+                // Get the status text from the span inside the cell (use lowercase for matching)
+                const statusSpanA = cellA.querySelector('.status-box');
+                const statusSpanB = cellB.querySelector('.status-box');
+                const statusTextA = statusSpanA ? (statusSpanA.innerText || statusSpanA.textContent).trim().toLowerCase() : 'unknown';
+                const statusTextB = statusSpanB ? (statusSpanB.innerText || statusSpanB.textContent).trim().toLowerCase() : 'unknown';
+                valA = statusOrder[statusTextA] !== undefined ? statusOrder[statusTextA] : statusOrder['unknown']; // Use lookup value or default
+                valB = statusOrder[statusTextB] !== undefined ? statusOrder[statusTextB] : statusOrder['unknown']; // Use lookup value or default
+                break;
+            case 3: // Last Updated (Date)
+                // Attempt to parse date, provide a fallback for invalid dates
+                const dateA = new Date(cellA.textContent || cellA.innerText);
+                const dateB = new Date(cellB.textContent || cellB.innerText);
+                valA = !isNaN(dateA) ? dateA.getTime() : 0; // Use 0 for invalid dates
+                valB = !isNaN(dateB) ? dateB.getTime() : 0; // Use 0 for invalid dates
+                break;
+            default: // Should not happen
+                valA = (cellA.textContent || cellA.innerText || "").trim().toLowerCase();
+                valB = (cellB.textContent || cellB.innerText || "").trim().toLowerCase();
+                break;
+        }
+
+        let comparison = 0;
+        if (valA > valB) comparison = 1;
+        else if (valA < valB) comparison = -1;
+
+        return direction === 'asc' ? comparison : comparison * -1; // Apply direction
+    });
+
+    // Re-append sorted rows
+    while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Initialize the page with default sorting by Status (Descending)
+window.onload = function() {
+    // Set initial active link based on current URL (optional but good practice)
+    const currentPath = window.location.pathname.split("/").pop(); // Get the filename
+    const links = document.querySelectorAll('.sidebar a');
+    links.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+            // If the active link is inside a collapsed section, expand it
+            const collapseParent = link.closest('.collapse');
+            if (collapseParent) {
+                new bootstrap.Collapse(collapseParent, { toggle: false }).show();
+                // Also activate the parent toggle link
+                const toggler = document.querySelector(`a[href="#${collapseParent.id}"]`);
+                if (toggler) toggler.classList.add('active'); // You might not want this visually
+            }
+        } else {
+            link.classList.remove('active');
+        }
+    });
+    // Ensure the main dashboard link is active if no specific match or on root path
+     if (!document.querySelector('.sidebar a.active') && (currentPath === 'doc_dashboard.html' || currentPath === '')) {
+         const dashboardLink = document.querySelector('.sidebar a[href="doc_dashboard.html"]');
+         if(dashboardLink) dashboardLink.classList.add('active');
+     }
+
+    // Default sort by Status on load
+    sortTable(2, 'Status'); // Sort by Status (index 2), pass name for button text
+};
+
+
+    // Toggle Patient List submenu
+    document.getElementById("patientListLink").addEventListener("click", function (e) {
+            e.preventDefault();
+            const group = document.querySelector(".sidebar-link-group");
+            group.style.display = group.style.display === "block" ? "none" : "block";
+        });
+
+    // Add this JavaScript to handle the 'active' class toggle
+    const links = document.querySelectorAll('.sidebar a');
+
+    links.forEach(link => {
+        link.addEventListener('click', function() {
+            links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+            this.classList.add('active'); // Add active class to clicked link
+        });
+    });
+
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #007bff; color: white;">
+                <h5 class="modal-title" id="welcomeModalLabel">Welcome!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <h4>Hi, <strong>{{ doctor['username'] }}</strong>!</h4>
+                    <p>We're glad to have you back.</p>
+                    <p class="text-muted">If you need any assistance, feel free to reach out!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <!-- Trigger modal automatically on page load if message is flashed -->
+        <script>
+            var myModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+            myModal.show();  // Show the modal when the page loads with a message
+        </script>
+    {% endif %}
+{% endwith %}
+
+</body>
+</html>
