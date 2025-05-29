@@ -590,4 +590,248 @@
             }
 
             currentSortColumn = columnIndex;
-            currentSortDir
+            currentSortDirection = direction;
+
+            // Update the sort button label
+            sortButton.childNodes[0].nodeValue = `Sort by: ${columnName} `; // Use nodeValue to target the text node
+
+            // Update sort indicator
+            sortIndicator.className = `sort-indicator ${direction === 'asc' ? 'sort-asc' : 'sort-desc'}`;
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.cells[columnIndex];
+                const cellB = rowB.cells[columnIndex];
+                let valA, valB;
+
+                // Handle sorting logic based on column type
+                switch (columnIndex) {
+                    case 0: // Patient Name (String)
+                        valA = (cellA.textContent || cellA.innerText || "").trim().toLowerCase();
+                        valB = (cellB.textContent || cellB.innerText || "").trim().toLowerCase();
+                        break;
+                    case 1: // CGM Level (Number)
+                        valA = parseFloat((cellA.textContent || cellA.innerText).match(/[\d\.]+/)?.[0]) || 0;
+                        valB = parseFloat((cellB.textContent || cellB.innerText).match(/[\d\.]+/)?.[0]) || 0;
+                        break;
+                    case 2: // Status (Custom Order) - **FIXED**
+                        // Get the status text from the span inside the cell (use lowercase for matching)
+                        const statusSpanA = cellA.querySelector('.status-box');
+                        const statusSpanB = cellB.querySelector('.status-box');
+                        const statusTextA = statusSpanA ? (statusSpanA.innerText || statusSpanA.textContent).trim().toLowerCase() : 'unknown';
+                        const statusTextB = statusSpanB ? (statusSpanB.innerText || statusSpanB.textContent).trim().toLowerCase() : 'unknown';
+                        valA = statusOrder[statusTextA] !== undefined ? statusOrder[statusTextA] : statusOrder['unknown']; // Use lookup value or default
+                        valB = statusOrder[statusTextB] !== undefined ? statusOrder[statusTextB] : statusOrder['unknown']; // Use lookup value or default
+                        break;
+                    case 3: // Last Updated (Date)
+                        // Attempt to parse date, provide a fallback for invalid dates
+                        const dateA = new Date(cellA.textContent || cellA.innerText);
+                        const dateB = new Date(cellB.textContent || cellB.innerText);
+                        valA = !isNaN(dateA) ? dateA.getTime() : 0; // Use 0 for invalid dates
+                        valB = !isNaN(dateB) ? dateB.getTime() : 0; // Use 0 for invalid dates
+                        break;
+                    default: // Should not happen
+                        valA = (cellA.textContent || cellA.innerText || "").trim().toLowerCase();
+                        valB = (cellB.textContent || cellB.innerText || "").trim().toLowerCase();
+                        break;
+                }
+
+                let comparison = 0;
+                if (valA > valB) comparison = 1;
+                else if (valA < valB) comparison = -1;
+
+                return direction === 'asc' ? comparison : comparison * -1; // Apply direction
+            });
+
+            // Re-append sorted rows
+            while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Initialize the page with default sorting by Status (Descending)
+        window.onload = function () {
+            // Set initial active link based on current URL (optional but good practice)
+            const currentPath = window.location.pathname.split("/").pop(); // Get the filename
+            const links = document.querySelectorAll('.sidebar a');
+            links.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    // If the active link is inside a collapsed section, expand it
+                    const collapseParent = link.closest('.collapse');
+                    if (collapseParent) {
+                        new bootstrap.Collapse(collapseParent, { toggle: false }).show();
+                        // Also activate the parent toggle link
+                        const toggler = document.querySelector(`a[href="#${collapseParent.id}"]`);
+                        if (toggler) toggler.classList.add('active'); // You might not want this visually
+                    }
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            // Ensure the main dashboard link is active if no specific match or on root path
+            if (!document.querySelector('.sidebar a.active') && (currentPath === 'doc_dashboard.html' || currentPath === '')) {
+                const dashboardLink = document.querySelector('.sidebar a[href="doc_dashboard.html"]');
+                if (dashboardLink) dashboardLink.classList.add('active');
+            }
+
+            // Default sort by Status on load
+            sortTable(2, 'Status'); // Sort by Status (index 2), pass name for button text
+        };
+
+
+        // Toggle Patient List submenu
+        document.getElementById("patientListLink").addEventListener("click", function (e) {
+            e.preventDefault();
+            const group = document.querySelector(".sidebar-link-group");
+            group.style.display = group.style.display === "block" ? "none" : "block";
+        });
+
+        // Add this JavaScript to handle the 'active' class toggle
+        const links = document.querySelectorAll('.sidebar a');
+
+        links.forEach(link => {
+            link.addEventListener('click', function () {
+                links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+                this.classList.add('active'); // Add active class to clicked link
+            });
+        });
+
+
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- 渲染图表 -->
+    <script>
+        const chartData = {{ chart_data | tojson | safe }};  // 应为 [3, 4, 2, 1] 等等
+        console.log("Chart Data:", chartData);
+
+        const healthStatusChart = new Chart(document.getElementById('healthStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Stable', 'Critical', 'Recovered', 'Warning'],
+                datasets: [{
+                    label: 'Health Status',
+                    data: chartData,
+                    backgroundColor: [
+                        '#28a745',  // Stable (Green)
+                        '#dc3545',  // Critical (Red)
+                        '#17a2b8',  // Recovered (Blue)
+                        '#ffc107'   // Warning (Yellow)
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 14 }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+    <script>
+        function generateCalendar() {
+            const now = new Date();
+
+            // 马来西亚时间 (GMT+8)
+            const malaysiaTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kuala_Lumpur" }));
+            const currentYear = malaysiaTime.getFullYear();
+            const currentMonth = malaysiaTime.getMonth();
+            const todayDate = malaysiaTime.getDate();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+            // 显示月份和年份
+            document.getElementById('currentMonthYear').textContent = `${monthNames[currentMonth]} - ${currentYear}`;
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            const calendarGrid = document.getElementById('calendarDays');
+            calendarGrid.innerHTML = "";
+
+            // 添加星期
+            daysOfWeek.forEach(day => {
+                const dayCell = document.createElement('div');
+                dayCell.style.fontWeight = 'bold';
+                dayCell.textContent = day;
+                calendarGrid.appendChild(dayCell);
+            });
+
+            // 添加空格
+            for (let i = 0; i < firstDay; i++) {
+                calendarGrid.appendChild(document.createElement('div'));
+            }
+
+            // 添加日期
+            for (let day = 1; day <= totalDays; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.textContent = day;
+                if (day === todayDate) {
+                    dayCell.classList.add('highlight');
+                }
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        function updateMalaysiaTime() {
+            const now = new Date();
+            const malaysiaTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Kuala_Lumpur" }));
+            const timeString = malaysiaTime.toLocaleTimeString();
+            document.getElementById('malaysiaTime').textContent = "Malaysia Time: " + timeString;
+        }
+
+        // 初始化
+        generateCalendar();
+        updateMalaysiaTime();
+        setInterval(updateMalaysiaTime, 1000);  // 每秒更新时间
+    </script>
+
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #007bff; color: white;">
+                    <h5 class="modal-title" id="welcomeModalLabel">Welcome!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <h4>Hi, <strong>{{ doctor['username'] }}</strong>!</h4>
+                        <p>We're glad to have you back.</p>
+                        <p class="text-muted">If you need any assistance, feel free to reach out!</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <!-- Trigger modal automatically on page load if message is flashed -->
+    <script>
+        var myModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+        myModal.show();  // Show the modal when the page loads with a message
+    </script>
+
+    {% endif %}
+    {% endwith %}
+
+</body>
+
+</html>
