@@ -368,9 +368,6 @@ def dashboard_page():
 
         avg_cgm_level = cursor.fetchone()['avg_cgm'] or 0
 
-        
-
-
     except pymysql.MySQLError as e:
         flash(f"Database error: {e}")
         return redirect('/login')
@@ -385,8 +382,7 @@ def dashboard_page():
                            chart_data=chart_data,
                            new_patients_7_days=new_patients_7_days,
                            new_patients_30_days=new_patients_30_days,
-                           avg_cgm_level=avg_cgm_level)    return render_template('doc_dashboard.html', doctor=doctor, patients=patients, chart_data=chart_data)
-
+                           avg_cgm_level=avg_cgm_level)   
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
