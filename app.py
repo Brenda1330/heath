@@ -371,18 +371,20 @@ def dashboard_page():
     except pymysql.MySQLError as e:
         flash(f"Database error: {e}")
         return redirect('/login')
+
     finally:
         if conn:
             conn.close()
 
     return render_template("doc_dashboard.html",
-                           doctor=doctor,
-                           patients=patients,
-                           total_patients=total_patients,
-                           chart_data=chart_data,
-                           new_patients_7_days=new_patients_7_days,
-                           new_patients_30_days=new_patients_30_days,
-                           avg_cgm_level=avg_cgm_level)   
+                        doctor=doctor,
+                        patients=patients,
+                        total_patients=total_patients,
+                        chart_data=chart_data,
+                        new_patients_7_days=new_patients_7_days,
+                        new_patients_30_days=new_patients_30_days,
+                        avg_cgm_level=avg_cgm_level)
+    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
