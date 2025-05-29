@@ -255,16 +255,9 @@ def generate_recommendations_for_doctor(doctor_id):
     cursor.close()
     conn.close()
 
-def get_db_connection():
-    return pymysql.connect(
-        host='localhost',
-        user='root',
-        password='',  # Add your database password here if any
-        database='health'
-    )
-
 @app.route('/')
 def home():
+    form = LoginForm()
     remember_token = request.cookies.get('remember_token')
     if remember_token:
         print("Remember Me cookie is present.")
@@ -293,7 +286,7 @@ def home():
             print(f"Error loading user from token: {e}")
             flash("Session expired or invalid. Please log in again.")
             return redirect('/login')
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
