@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Doctor Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9fc;
+    }
+
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      background: linear-gradient(180deg, #1b1f3a, #2c3553);
+      color: white;
+      top: 0;
+      left: 0;
+      padding: 30px 20px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .sidebar-header h4 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: background 0.3s ease, padding-left 0.3s ease;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 10px;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding-left: 25px;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 40px;
+      max-width: 600px;
+      margin: auto;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h3 {
+      font-weight: 700;
+      margin-bottom: 30px;
+      color: #1f2b3a;
+      text-align: center;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #3b3f50;
+    }
+
+    .form-control,
+    .form-select {
+      border-radius: 12px;
+      padding: 10px 15px;
+      border: 1px solid #cbd3df;
+    }
+
+    .btn-submit {
+      background: linear-gradient(to right, #68c4af, #7cd4e1);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 10px 25px;
+      border-radius: 30px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(to right, #56b0a1, #60c6da);
+    }
+
+    .btn-cancel {
+      background-color: #ccc;
+      color: #333;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 25px;
+      font-weight: 600;
+    }
+
+    .btn-cancel:hover {
+      background-color: #bbb;
+    }
+
+    .form-text {
+      font-size: 12px;
+      color: #6c757d;
+    }
+
+    .profile-dropdown .dropdown-toggle {
+      background-color: transparent;
+      border: none;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .profile-dropdown .dropdown-menu {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar" data-aos="fade-right">
+    <div class="sidebar-header text-center">
+      <h4><i class="fas fa-cogs me-2"></i> Admin Panel</h4>
+    </div>
+    <ul class="nav flex-column">
+      <li class="nav-item"><a href="{{ url_for('admin_dashboard') }}" class="nav-link"><i class="fas fa-th-large me-2"></i> Dashboard</a></li>
+      <li class="nav-item"><a href="{{ url_for('admin_add_doctor') }}" class="nav-link active"><i class="fas fa-user-plus me-2"></i> Add Doctor</a></li>
+      <li class="nav-item"><a href="{{ url_for('admin_system_logs') }}" class="nav-link"><i class="fas fa-file-alt me-2"></i> System Logs</a></li>
+      <li class="nav-item"><a href="{{ url_for('admin_security_audit') }}" class="nav-link"><i class="fas fa-shield-alt me-2"></i> Security Audit</a></li>
+      <li class="nav-item"><a href="{{ url_for('admin_doctor_details') }}" class="nav-link"><i class="fas fa-user-md me-2"></i> Doctor Details</a></li>
+      <li class="nav-item"><a href="{{ url_for('admin_manage_user') }}" class="nav-link"><i class="fas fa-users-cog me-2"></i> Manage User</a></li>
+    </ul>
+  </div>
+
+  <!-- Profile Dropdown (Top Right) -->
+  <div class="profile-dropdown position-absolute" style="top: 20px; right: 30px;">
+    <div class="dropdown">
+      <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-user-circle"></i>
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Form -->
+  <div class="main-content">
+    <h3>Add Doctor Account</h3>
+    <div class="card" data-aos="fade-up">
+      <form action="{{ url_for('admin_add_doctor') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <div class="mb-3">
+          <label for="username" class="form-label">Full Name</label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="Enter doctor's name" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Enter email address" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="photo" class="form-label">Profile Photo</label>
+          <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+          <div class="form-text">Optional: JPG, PNG, GIF – max 2 MB. System will auto-resize.</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Role</label>
+          <select class="form-select" disabled>
+            <option selected>Doctor</option>
+          </select>
+          <input type="hidden" name="role" value="doctor">
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a href="{{ url_for('admin_dashboard') }}" class="btn btn-cancel">Cancel</a>
+          <button type="submit" class="btn btn-submit">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+  </script>
+
+</body>
+</html>

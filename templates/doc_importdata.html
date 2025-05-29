@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Data Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1b1f3a, #2c3553);
+            color: white;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding: 30px 20px;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        transition: background 0.3s ease, padding-left 0.3s ease;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        }
+
+        .sidebar .nav-link i {
+        margin-right: 10px;
+        }
+
+        .sidebar .nav-link i.fas.fa-chevron-down {
+            margin-left: 20px;
+        }
+
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding-left: 25px;
+        color: #fff;
+        text-decoration: none;
+        }
+
+        .sidebar-header h4 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .content-container {
+            margin-left: 270px;
+            padding: 40px;
+        }
+
+        .import-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .import-section h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .import-section .file-upload {
+            display: flex;
+            align-items: center;
+            border: 2px dashed #007bff;
+            padding: 40px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .file-upload i {
+            margin-right: 20px;
+            font-size: 30px;
+        }
+
+        .table-container {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .checkbox-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+
+        .checkbox-container .btn {
+            margin-top: 10px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-center .btn {
+            width: 150px;
+        }
+
+        .checkbox-container button {
+            margin-right: 10px;
+        }
+
+        /* Filter Dropdown Style */
+        .filter-dropdown {
+            float: right;
+        }
+
+        .filter-dropdown button {
+            margin-top: 10px;
+            margin-left: 10px;
+            margin-bottom: 10px;
+        }
+
+        .profile-dropdown .dropdown-toggle {
+            background-color: transparent;
+            border: none;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .profile-dropdown .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header text-center">
+        <h4><i class="fas fa-stethoscope me-2"></i> Doctor Panel</h4>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a href="doc_dashboard.html" class="nav-link"><i class="fas fa-th-large me-2"></i><span> Dashboard</span></a></li>
+        <li class="nav-item"><a href="doc_addpatient.html" class="nav-link"><i class="fas fa-user-plus me-2"></i><span> Add Patient</span></a></li>
+        <li class="nav-item"><a href="doc_patientlist.html" class="nav-link"><i class="fas fa-users"></i><span> Patient List</span></a></li>
+        <li class="nav-item"><a href="#patientSubmenu" class="nav-link active" data-bs-toggle="collapse"><i class="fas fa-syringe"></i><span> Patient</span><i class="fas fa-chevron-down float-end"></i></a></li>
+    <div class="collapse" id="patientSubmenu">
+        <li class="nav-item"><a href="doc_importdata.html" class="nav-link active"><i class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a></li>
+        <li class="nav-item"><a href="doc_recommendation.html" class="nav-link"><i class="fas fa-bolt"></i><span> Recommendation</span></a></li>
+        <li class="nav-item"><a href="doc_graphexp.html" class="nav-link"><i class="fas fa-chart-line"></i><span> Graph Explorer</span></a></li>
+        <li class="nav-item"><a href="doc_algorithm.html" class="nav-link"><i class="fas fa-cogs"></i><span> Algorithm Runner</span></a></li>
+    </div>
+    <li class="nav-item"><a href="doc_reports.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span> Reports</span></a></li>
+    <li class="nav-item"><a href="doc_userprofile.html" class="nav-link"><i class="fas fa-user-circle"></i><span> View Profile</span></a></li>
+</div>
+
+<!-- Profile Dropdown (Top Right) -->
+<div class="profile-dropdown position-absolute" style="top: 10px; right: 30px;">
+  <div class="dropdown">
+    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-user-circle"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <li><a class="dropdown-item" href="doc_userprofile.html">View Profile</a></li>
+        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Content -->
+<div class="content-container">
+    <div class="import-section">
+        <h1 id="importTitle">Import Health Data</h1>
+        <!-- Show flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        
+        <!-- File Upload Section -->
+        <form method="POST" action="/doc_importdata.html" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="file-upload" ondrop="handleFileDrop(event)" ondragover="allowDrop(event)">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div>
+                    <p>Drag and drop a file here or</p>
+                    <input type="file" name="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)" />
+                    <button type="button" class="btn btn-custom" onclick="document.getElementById('fileInput').click()">Select File</button>
+                </div>
+            </div>
+            <!-- File Info -->
+            <div>
+                <p><strong>File added:</strong> <span id="fileInfo">No file selected</span></p>
+            </div>
+
+            <div class="mb-3">
+                <label for="selected_patient_id" class="form-label">Select Patient:</label>
+                <select class="form-select" id="selected_patient_id" name="selected_patient_id" onchange="updateTitle()">
+                    {% for p in patients %}
+                        <option value="{{ p.patient_id }}">{{ p.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="selected_date" class="form-label">Select Date:</label>
+                <input type="date" class="form-control" name="selected_date" id="selected_date" required>
+            </div>
+
+            <!-- Import Button (inside the form now) -->
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-upload me-2"></i>Upload CSV</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <div class="filter-dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Filter
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item" href="#" onclick="filterTable('All')">All</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterTable('Active')">Active</a></li>
+                <li><a class="dropdown-item" href="#" onclick="filterTable('Inactive')">Inactive</a></li>
+            </ul>
+        </div>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th><input type="checkbox"></th>
+                    <th>Patient Name</th>
+                    <th>Age</th>
+                    <th>Diagnosis</th>
+                    <th>Status</th>
+                    <th>Last Update</th>
+                </tr>
+            </thead>
+            <tbody id="patientData">
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>Jane Cooper</td>
+                    <td>50</td>
+                    <td>Diabetes</td>
+                    <td class="text-success">Active</td>
+                    <td>2025-04-12</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>John Doe</td>
+                    <td>40</td>
+                    <td>Hypertension</td>
+                    <td class="text-danger">Inactive</td>
+                    <td>2025-03-22</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Buttons -->
+        <div class="checkbox-container">
+            <button class="btn btn-danger" onclick="deleteRows()">Delete</button>
+            <button class="btn btn-success" onclick="exportData()">Export</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Allow drop event
+        function allowDrop(event) {
+            event.preventDefault(); // Prevent the default behavior (e.g., opening the file)
+        }
+
+        // Handle file drop
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0]; // Get the first file
+            if (file) {
+                document.getElementById('fileInfo').textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            }
+        }
+
+        // Handle file select
+        function handleFileSelect(event) {
+            const file = event.target.files[0]; // Get the selected file
+            if (file) {
+                document.getElementById('fileInfo').textContent = `${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            }
+        }
+
+    // File upload handling
+    document.getElementById('fileInput').addEventListener('change', function() {
+        const file = this.files[0];
+        const fileInfo = file ? `${file.name} (${(file.size / 1024).toFixed(2)} KB)` : 'No file selected';
+        document.getElementById('fileInfo').textContent = fileInfo;
+    });
+
+    // Filter Table by status (Active/Inactive)
+    function filterTable(status) {
+        const rows = document.querySelectorAll('#patientData tr');
+        rows.forEach(row => {
+            const statusCell = row.cells[4].textContent;
+            if (status === 'All' || statusCell.toLowerCase() === status.toLowerCase()) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Delete rows
+    function deleteRows() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        checkboxes.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            row.remove();
+        });
+    }
+
+    // Export data (Placeholder function)
+    function exportData() {
+        alert("Exporting data as CSV...");
+    }
+
+    // Add this JavaScript to handle the 'active' class toggle
+    const links = document.querySelectorAll('.sidebar a');
+
+    links.forEach(link => {
+        link.addEventListener('click', function() {
+            links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+            this.classList.add('active'); // Add active class to clicked link
+        });
+    });
+    function updateTitle() {
+    const select = document.getElementById("selected_patient_id");
+    const selectedName = select.options[select.selectedIndex].text;
+    document.getElementById("importTitle").innerText = `Import Health Data for Patient: ${selectedName}`;
+}
+
+</script>
+
+</body>
+</html>

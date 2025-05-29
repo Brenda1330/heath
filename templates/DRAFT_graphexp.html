@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Explorer Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #ffffff;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center; /* Vertically align icon and text */
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .sidebar a:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Styling for active links */
+        .sidebar a.active {
+            background-color: #2877b9; /* Dark blue background */
+            color: white; /* White text */
+            font-weight: bold; /* Make the text bold */
+        }
+
+        .sidebar a.active i {
+            color: white; /* Change icon color to white */
+        }
+
+        .sidebar a i {
+            margin-right: 10px; /* Adds space between icon and text */
+            font-size: 18px; /* Adjust icon size */
+        }
+
+        /* Centering the text in the remaining space */
+        .sidebar a span {
+            flex-grow: 1; /* Allow the text to take available space and be centered */
+            text-align: center; /* Center the text */
+        }
+
+        .content-container {
+            margin-left: 270px;
+            padding: 40px;
+        }
+
+        .graph-explorer-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .graph-explorer-section h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .filter-section select, .filter-section input, .filter-section button {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 200px;
+        }
+
+        .filter-section button {
+            background-color: #2877b9;
+            color: white;
+            border: none;
+        }
+
+        .graph-section {
+            margin-top: 20px;
+            height: 300px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .back-button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0f0f0;
+            padding: 8px 16px;
+            color: #2877b9;
+            border: none;
+            cursor: pointer;
+        }
+
+        .no-results {
+            color: #aaa;
+        }
+
+        .profile-button {
+            position: absolute;
+            top: 5px;
+            right: 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .profile-button img {
+            width: 20px;  /* Set the fixed size of the image */
+            height: 20px; /* Set the fixed height to make it circular */
+            border-radius: 50%; /* Make the image circular */
+            object-fit: cover; /* Ensure the image is cropped correctly */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <a href="doc_dashboard.html" class="sidebar-link ms-3"><i class="fas fa-th"></i><span> Dashboard</span></a>
+    <a href="doc_addpatient.html" class="sidebar-link ms-3"><i class="fas fa-user-plus"></i><span> Add Patient</span></a>
+    <a href="doc_patientlist.html" class="sidebar-link ms-3"><i class="fas fa-users"></i><span> Patient List</span></a>
+    <a href="#patientSubmenu" class="btn btn-link active" data-bs-toggle="collapse"><i class="fas fa-stethoscope"></i><span> Patient</span><i class="fas fa-chevron-down float-end"></i></a>
+    <div class="collapse" id="patientSubmenu">
+        <a href="doc_importdata.html" class="sidebar-link ms-3"><i class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a>
+        <a href="doc_recommendation.html" class="sidebar-link ms-3"><i class="fas fa-chart-line"></i><span> Recommendation</span></a>
+        <a href="doc_history.html" class="sidebar-link ms-3"><i class="fas fa-history"></i><span> History</span></a>
+        <a href="doc_graphexp.html" class="sidebar-link ms-3 active"><i class="fas fa-chart-line"></i><span> Graph Explorer</span></a>
+        <a href="doc_insight.html" class="sidebar-link ms-3"><i class="fas fa-bolt"></i><span> Insights</span></a>
+        <a href="doc_filter.html" class="sidebar-link ms-3"><i class="fas fa-filter"></i><span> Filter Graph</span></a>
+        <a href="doc_compare.html" class="sidebar-link ms-3"><i class="fas fa-exchange-alt"></i><span> Compare Graph</span></a>
+        <a href="doc_algorithm.html" class="sidebar-link ms-3"><i class="fas fa-cogs"></i><span> Algorithm Runner</span></a>
+    </div>
+    <a href="doc_reports.html" class="report-link"><i class="fas fa-clipboard-list"></i><span> Reports</span></a>
+    <a href="doc_userprofile.html"><i class="fas fa-user-circle"></i><span> View Profile</span></a>
+</div>
+
+    <button class="back-button">Back</button>
+</div>
+
+<!-- Profile Button in Top Right -->
+<button class="profile-button" data-bs-toggle="dropdown" aria-expanded="false">
+    <img src="https://www.pngmart.com/files/23/Profile-PNG-Photo.png" alt="Profile Image" >
+    </button>
+    
+    <!-- Profile Dropdown Menu -->
+    <div class="dropdown-menu dropdown-menu-end">
+    <a class="dropdown-item" href="doc_userprofile.html">View Profile</a>
+    <a class="dropdown-item" href="login.html">Logout</a>
+    </div>
+
+<!-- Content -->
+<div class="content-container">
+    <div class="graph-explorer-section">
+        <h1>PHKG Viewer</h1>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div>
+                <label for="selectPatient">Patient</label>
+                <select id="selectPatient">
+                    <option value="Jane Cooper">Jane Cooper</option>
+                    <option value="John Doe">John Doe</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="selectMetric">Metric</label>
+                <select id="selectMetric">
+                    <option value="0">0</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="selectNodeType">Node Type</label>
+                <select id="selectNodeType">
+                    <option value="Condition">Condition</option>
+                    <option value="Medication">Medication</option>
+                    <option value="Behavior">Behavior</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="startDate">Time Range</label>
+                <input type="date" id="startDate" />
+                <input type="date" id="endDate" />
+            </div>
+
+            <div>
+                <button onclick="applyFilters()">Apply Filter</button>
+                <button onclick="resetFilters()">Reset</button>
+            </div>
+        </div>
+
+        <!-- Graph Section -->
+        <div class="graph-section" id="graphSection">
+            <p class="no-results">Graph for selected filter will be displayed here...</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Apply Filters Function
+    function applyFilters() {
+        const patient = document.getElementById("selectPatient").value;
+        const metric = document.getElementById("selectMetric").value;
+        const nodeType = document.getElementById("selectNodeType").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+        const graphSection = document.getElementById("graphSection");
+        const noResults = document.querySelector('.no-results');
+
+        // Simulate filter application and graph update
+        if (patient && metric && nodeType) {
+            graphSection.innerHTML = `<p>Graph for ${nodeType} from ${startDate} to ${endDate}</p>`;
+            noResults.style.display = 'none';
+        } else {
+            graphSection.innerHTML = "";
+            noResults.style.display = 'block';
+        }
+    }
+
+    // Reset Filters Function
+    function resetFilters() {
+        document.getElementById("selectPatient").value = "Jane Cooper";
+        document.getElementById("selectMetric").value = "0";
+        document.getElementById("selectNodeType").value = "Condition";
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+
+        const graphSection = document.getElementById("graphSection");
+        graphSection.innerHTML = `<p class="no-results">Graph for selected filter will be displayed here...</p>`;
+    }
+
+    // Sidebar functionality to show and hide links when Patient List is clicked
+    document.getElementById("patientListLink").addEventListener("click", function() {
+        const sidebar = document.getElementById("sidebar");
+        const links = document.querySelectorAll(".sidebar-link");
+        sidebar.classList.toggle("active"); // Toggle the active class to show/hide the links
+    });
+
+    // Toggle Patient List submenu
+    document.getElementById("patientListLink").addEventListener("click", function (e) {
+            e.preventDefault();
+            const group = document.querySelector(".sidebar-link-group");
+            group.style.display = group.style.display === "block" ? "none" : "block";
+        });
+
+    // Add this JavaScript to handle the 'active' class toggle
+    const links = document.querySelectorAll('.sidebar a');
+
+    links.forEach(link => {
+        link.addEventListener('click', function() {
+            links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+            this.classList.add('active'); // Add active class to clicked link
+        });
+    });
+</script>
+
+</body>
+</html>

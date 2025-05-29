@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f9f9fc;
+    }
+
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      position: fixed;
+      background: linear-gradient(180deg, #1b1f3a, #2c3553);
+      color: white;
+      top: 0;
+      left: 0;
+      padding: 30px 20px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .sidebar-header h4 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      transition: background 0.3s ease, padding-left 0.3s ease;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 10px;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding-left: 25px;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .main-content {
+      margin-left: 230px;
+      padding: 30px;
+    }
+
+    .dashboard-header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .search-bar {
+      max-width: 400px;
+      margin-bottom: 20px;
+    }
+
+    .table {
+      background-color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-success {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-fail {
+      color: red;
+      font-weight: bold;
+    }
+
+    .profile-dropdown .dropdown-toggle {
+      background-color: transparent;
+      border: none;
+      color: #333;
+      font-size: 24px;
+    }
+
+    .profile-dropdown .dropdown-menu {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-header text-center">
+    <h4><i class="fas fa-cogs me-2"></i> Admin Panel</h4>
+  </div>
+  <ul class="nav flex-column">
+    <li class="nav-item"><a href="{{ url_for('admin_dashboard') }}" class="nav-link active"><i class="fas fa-th-large me-2"></i> Dashboard</a></li>
+    <li class="nav-item"><a href="{{ url_for('admin_add_doctor') }}" class="nav-link"><i class="fas fa-user-plus me-2"></i> Add Doctor</a></li>
+    <li class="nav-item"><a href="{{ url_for('admin_system_logs') }}" class="nav-link"><i class="fas fa-file-alt me-2"></i> System Logs</a></li>
+    <li class="nav-item"><a href="{{ url_for('admin_security_audit') }}" class="nav-link"><i class="fas fa-shield-alt me-2"></i> Security Audit</a></li>
+    <li class="nav-item"><a href="{{ url_for('admin_doctor_details') }}" class="nav-link"><i class="fas fa-user-md me-2"></i> Doctor Details</a></li>
+    <li class="nav-item"><a href="{{ url_for('admin_manage_user') }}" class="nav-link"><i class="fas fa-users-cog me-2"></i> Manage User</a></li>
+  </ul>
+</div>
+
+<!-- Profile Dropdown (Top Right) -->
+<div class="profile-dropdown position-absolute" style="top: 20px; right: 30px;">
+  <div class="dropdown">
+    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fas fa-user-circle"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="dashboard-header">Welcome to Admin Dashboard</div>
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card text-center p-4 shadow-sm" style="border-radius: 16px;">
+        <h6 class="text-muted mb-2">Doctors</h6>
+        <h2 class="count" data-target="{{ doctor_count }}">0</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-4 shadow-sm" style="border-radius: 16px;">
+        <h6 class="text-muted mb-2">Patients</h6>
+        <h2 class="count" data-target="{{ patient_count }}">0</h2>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center p-4 shadow-sm" style="border-radius: 16px;">
+        <h6 class="text-muted mb-2">Completed Audits</h6>
+        <h2 class="count" data-target="{{ audit_count }}">0</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="card p-4 shadow-sm mb-5" style="border-radius: 16px;">
+    <h5 class="mb-3">CGM Level Trends (Last 7 Days)</h5>
+    <canvas id="cgmChart" height="100"></canvas>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+  const counters = document.querySelectorAll('.count');
+  const runCounter = (counter) => {
+    const updateCount = () => {
+      const target = +counter.getAttribute('data-target');
+      const current = +counter.innerText;
+      const increment = Math.ceil(target / 100);
+      if (current < target) {
+        counter.innerText = current + increment;
+        setTimeout(updateCount, 20);
+      } else {
+        counter.innerText = target;
+      }
+    };
+    updateCount();
+  };
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        runCounter(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.7 });
+  counters.forEach(counter => observer.observe(counter));
+
+  const chartLabels = JSON.parse('{{ labels | tojson | safe }}');
+  const chartData = JSON.parse('{{ data | tojson | safe }}');
+
+  const ctx = document.getElementById('cgmChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: 'Avg CGM Level',
+        data: chartData,
+        fill: true,
+        borderColor: '#5f9eff',
+        backgroundColor: 'rgba(95, 158, 255, 0.2)',
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
