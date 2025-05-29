@@ -18,6 +18,9 @@ import string
 import hashlib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 app.secret_key = 'password'
@@ -58,9 +61,6 @@ class HealthData(db.Model):
     insulin_intake = db.Column(db.Integer)
     weight = db.Column(db.Float)
     hb1ac = db.Column(db.Float)
-
-
-
 
 # ✅ 邮件发送函数
 def send_invoice_email(to_email, html_content):
@@ -294,59 +294,118 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+    form = LoginForm()
 
-        # Debugging: Print email and password
-        print(f"Email: {email}, Password: {password}")
-
-        # Connect to the database and validate login
-        conn = get_db_connection()
-        cursor = conn.cursor(DictCursor)
-        cursor.execute("SELECT user_id, username, role FROM users WHERE email = %s AND password_hash = %s" , (email, password))
-        user = cursor.fetchone()
-        cursor.close()
-        conn.close()
-
-        if user:
-            session['user_id'] = user['user_id']  # Store user_id in session
-            session['username'] = user['username']  # Store username in session
-
-            # If 'Remember Me' is checked, store a persistent cookie
-            remember_me = request.form.get('remember_me')
-            if remember_me:
-                # Create a secure token using itsdangerous serializer
-                token = s.dumps(user['user_id'])  # Serialize the user_id
-                print(f"Generated token: {token}")  # Debugging line to check the generated token
-                # Set the token as a cookie that will expire in 30 days
-                
-                if (user["role"]=="doctor"):
-                    resp = make_response(redirect('/doc_dashboard.html'))
-                    resp.set_cookie('remember_token', token, max_age=timedelta(days=30))
-                    print("Remember me cookie set")  # Debugging line to confirm cookie is set
-                    return resp
-                elif (user["role"]=="admin"):
-                    resp = make_response(redirect('/admin_dashboard.html'))
-                    resp.set_cookie('remember_token', token, max_age=timedelta(days=30))
-                    print("Remember me cookie set")  # Debugging line to confirm cookie is set
-                    return resp
-            
-            # Set a flag in session to show a one-time message
-            if (user['role'] == 'doctor'):
-                flash(f"Welcome, {user['username']}!")  # Flash the welcome message
-                return render_template('login.html', login_success=True)
-                return redirect('/doc_dashboard.html') 
-            
-            elif (user['role'] == 'admin'):
-                    flash(f"Welcome, {user['username']}!")  # Flash the welcome message
-                    return render_template('login.html', login_admin_success=True)
-
+    if 'user_id' in session and 'role' in session:
+        user_role = session['role']
+        if user_role == 'doctor':
+            return redirect(url_for('dashboard_page'))
+        elif user_role == 'admin':
+            return redirect(url_for('admin_dashboard'))
         else:
-            
-            return render_template('login.html', login_error_message=True)
+            return redirect(url_for('home'))
 
-    return render_template('login.html')
+    # --- Phase 2: "Remember Me" cookie check ---
+    if request.method == 'GET':
+        remember_token = request.cookies.get('remember_token')
+        if remember_token:
+            conn_rem_local, cursor_rem_local = None, None
+            try:
+                user_id_from_token = s.loads(remember_token, max_age=timedelta(days=30).total_seconds())
+                conn_rem_local = get_db_connection()
+                if conn_rem_local:
+                    cursor_rem_local = conn_rem_local.cursor(dictionary=True)
+                    cursor_rem_local.execute(
+                        "SELECT user_id, username, role, email FROM users WHERE user_id = %s AND status = 1",
+                        (user_id_from_token,))
+                    user_from_token = cursor_rem_local.fetchone()
+                    while cursor_rem_local.fetchone(): pass
+                    if cursor_rem_local: cursor_rem_local.close()
+                    if user_from_token:
+                        if conn_rem_local: conn_rem_local.close()
+                        session['user_id'] = user_from_token['user_id']
+                        session['username'] = user_from_token['username']
+                        session['role'] = user_from_token['role']
+                        flash(f"Welcome back, {user_from_token['username']}!", "info")
+                        if user_from_token['role'] == 'doctor':
+                            return redirect(url_for('dashboard_page'))
+                        elif user_from_token['role'] == 'admin':
+                            return redirect(url_for('admin_dashboard'))
+                        return redirect(url_for('home'))
+            except Exception as e:
+                print("❌ RememberMe error:", e)
+            finally:
+                if cursor_rem_local: cursor_rem_local.close()
+                if conn_rem_local: conn_rem_local.close()
+
+    # --- Phase 3: Handle Login POST ---
+    if request.method == 'POST':
+        email_candidate = request.form.get('email', '').strip()
+        password_candidate = request.form.get('password', '')
+        target_info = f"Email: {email_candidate}"
+
+        print("[DEBUG] Login POST reached")
+        print("[DEBUG] Input email:", email_candidate)
+        print("[DEBUG] Input password:", password_candidate)
+
+        if not email_candidate or not password_candidate:
+            flash("Email and password are required.", "warning")
+            return redirect(url_for('login'))
+
+        conn_post = None
+        cursor_post = None
+        try:
+            conn_post = get_db_connection()
+            cursor_post = conn_post.cursor()
+            cursor_post.execute(
+                "SELECT user_id, username, role, password_hash, status FROM users WHERE email = %s",
+                (email_candidate,))
+            user = cursor_post.fetchone()
+            while cursor_post.fetchone(): pass
+            cursor_post.close()
+
+            print("[DEBUG] User from DB:", user)
+            if user:
+                print("[DEBUG] Status:", user['status'])
+                print("[DEBUG] Password match:", check_password_hash(user['password_hash'], password_candidate))
+
+            if user and user['status'] == 1 and user['password_hash'] == password_candidate:
+                session.clear()
+                session['user_id'] = user['user_id']
+                session['username'] = user['username']
+                session['role'] = user['role']
+                session.permanent = True
+
+                remember_me_checked = request.form.get('rememberMe')
+                destination_url = url_for('dashboard_page') if user['role'] == 'doctor' else url_for('admin_dashboard')
+
+                resp = make_response(redirect(destination_url))
+                if remember_me_checked:
+                    token = s.dumps({'user_id': user['user_id']})
+                    resp.set_cookie('remember_token', token,
+                                    max_age=timedelta(days=30).total_seconds(),
+                                    httponly=True, samesite='Lax', secure=request.is_secure)
+                flash(f"Welcome, {user['username']}!", "success")
+                return resp
+            else:
+                print("❌ Invalid login attempt.")
+                flash('Invalid credentials or account inactive. Please try again.', 'danger')
+                return redirect(url_for('login'))
+
+        except Exception as e:
+            print("❌ Exception during login:", str(e))
+            flash("An unexpected error occurred.", "danger")
+            return redirect(url_for('login'))
+        finally:
+            if cursor_post: cursor_post.close()
+            if conn_post: conn_post.close()
+
+    # --- Phase 4: Render login form ---
+    return render_template('login.html', form=form)
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
 
 @app.route('/doc_dashboard.html')
 def dashboard_page():
