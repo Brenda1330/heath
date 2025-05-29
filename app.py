@@ -241,13 +241,11 @@ def dashboard_page():
         remember_token = request.cookies.get('remember_token')
         if remember_token:
             try:
-                # Decrypt the token to get the user_id
                 user_id = s.loads(remember_token, max_age=timedelta(days=30))
-                session['user_id'] = user_id  # Store in session
+                session['user_id'] = user_id
 
-                # Fetch the username associated with the user_id
                 conn = get_db_connection()
-                cursor = conn.cursor(pymysql.cursors.DictCursor)
+                cursor = conn.cursor(DictCursor)
                 cursor.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
                 doctor = cursor.fetchone()
                 cursor.close()
@@ -258,7 +256,6 @@ def dashboard_page():
                 else:
                     flash('Invalid session or cookie. Please log in again.')
                     return redirect('/login')
-
             except:
                 flash('Session expired or invalid. Please log in again.')
                 return redirect('/login')
@@ -266,28 +263,26 @@ def dashboard_page():
             flash('You need to log in first.')
             return redirect('/login')
 
-    user_id = session['user_id']  # Retrieve the user_id from session
-    print(f"Logged in user_id: {user_id}")
-
+    user_id = session['user_id']
     conn = None
     doctor = None
     patients = []
 
     try:
-        # Connect to the database and fetch the doctor's full name from users table
         conn = get_db_connection()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-        doctor = cursor.fetchone()  # Fetch the doctor's data
+        cursor = conn.cursor(DictCursor)
 
-        if doctor is None:
+        # 医生名
+        cursor.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
+        doctor = cursor.fetchone()
+        if not doctor:
             flash('Doctor not found')
             return redirect('/login')
 
-        # Fetch the patient's data for the logged-in doctor
+        # 病人资料
         cursor.execute("""
             SELECT p.patient_id, p.full_name, p.dob, p.gender, p.status, p.created_at,
-                h.cgm_level, h.timestamp AS last_updated
+                   h.cgm_level, h.timestamp AS last_updated
             FROM patients p
             LEFT JOIN (
                 SELECT patient_id, cgm_level, timestamp
@@ -300,32 +295,98 @@ def dashboard_page():
             ) h ON p.patient_id = h.patient_id
             WHERE p.doctor_id = %s
         """, (user_id,))
-        
         patients = cursor.fetchall()
 
-        # Format the 'created_at' and 'last_updated' fields for each patient
-        # … after you’ve done `patients = cursor.fetchall()` …
+        # 日期格式化
         for patient in patients:
-            # Format created_at (display only)
-            if isinstance(patient.get('created_at'), datetime):
+            if patient.get('created_at'):
                 patient['created_at'] = patient['created_at'].strftime('%d %b %Y')
+            raw = patient.get('last_updated')
+            if raw:
+                if isinstance(raw, str):
+                    try:
+                        dt = datetime.strptime(raw, '%d/%m/%Y %H:%M')
+                    except ValueError:
+                        try:
+                            dt = datetime.fromisoformat(raw)
+                        except ValueError:
+                            dt = datetime.strptime(raw, '%Y-%m-%d %H:%M:%S')
+                else:
+                    dt = raw
+                patient['last_updated'] = dt.strftime('%d %b %Y %H:%M')
 
-            # Format last_updated (display only, without breaking data)
-            last = patient.get('last_updated')
-            if isinstance(last, datetime):
-                patient['last_updated'] = last.strftime('%d %b %Y %H:%M')
-            else:
-                patient['last_updated'] = "N/A"
+        # 病人总数
+        cursor.execute("SELECT COUNT(*) AS total FROM patients WHERE doctor_id = %s", (user_id,))
+        total_patients = cursor.fetchone()['total']
+
+        # 各个 status 的数量（小写 key）
+        cursor.execute("""
+            SELECT status, COUNT(*)
+            FROM patients
+            WHERE doctor_id = %s
+            GROUP BY status
+        """, (user_id,))
+        status_counts = {row['status'].lower(): row['COUNT(*)'] for row in cursor.fetchall()}
+
+        stable_count = status_counts.get('stable', 0)
+        critical_count = status_counts.get('critical', 0)
+        recovered_count = status_counts.get('recovered', 0)
+        warning_count = status_counts.get('warning', 0)  
+
+        chart_data = [stable_count, critical_count, recovered_count, warning_count]
+
+        today = datetime.today()
+        last_7_days = today - timedelta(days=7)
+        last_30_days = today - timedelta(days=30)
+
+        # 查询过去 7 天新增病患数
+        cursor.execute("""
+            SELECT COUNT(*) AS count FROM patients 
+            WHERE doctor_id = %s AND created_at >= %s
+        """, (user_id, last_7_days))
+        new_patients_7_days = cursor.fetchone()['count']
+
+        # 查询过去 30 天新增病患数
+        cursor.execute("""
+            SELECT COUNT(*) AS count FROM patients 
+            WHERE doctor_id = %s AND created_at >= %s
+        """, (user_id, last_30_days))
+        new_patients_30_days = cursor.fetchone()['count']
+        
+        cursor.execute("""
+        SELECT ROUND(AVG(h.cgm_level), 1) AS avg_cgm
+        FROM health_data h
+        JOIN (
+            SELECT patient_id, MAX(timestamp) AS latest_time
+            FROM health_data
+            GROUP BY patient_id
+        ) latest ON h.patient_id = latest.patient_id AND h.timestamp = latest.latest_time
+        WHERE h.patient_id IN (
+            SELECT patient_id FROM patients WHERE doctor_id = %s
+        )
+    """, (user_id,))
+
+        avg_cgm_level = cursor.fetchone()['avg_cgm'] or 0
+
+        
+
 
     except pymysql.MySQLError as e:
         flash(f"Database error: {e}")
         return redirect('/login')
-
     finally:
         if conn:
             conn.close()
 
-    return render_template('doc_dashboard.html', doctor=doctor, patients=patients)
+    return render_template("doc_dashboard.html",
+                           doctor=doctor,
+                           patients=patients,
+                           total_patients=total_patients,
+                           chart_data=chart_data,
+                           new_patients_7_days=new_patients_7_days,
+                           new_patients_30_days=new_patients_30_days,
+                           avg_cgm_level=avg_cgm_level)    return render_template('doc_dashboard.html', doctor=doctor, patients=patients, chart_data=chart_data)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
