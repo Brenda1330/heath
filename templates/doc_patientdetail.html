@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Detail</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"/>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
+
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
@@ -32,18 +36,18 @@
         }
 
         .sidebar .nav-link {
-        color: rgba(255, 255, 255, 0.9);
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        transition: background 0.3s ease, padding-left 0.3s ease;
-        font-size: 15px;
-        display: flex;
-        align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease, padding-left 0.3s ease;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
         }
 
         .sidebar .nav-link i {
-        margin-right: 10px;
+            margin-right: 10px;
         }
 
         .sidebar .nav-link i.fas.fa-chevron-down {
@@ -53,10 +57,10 @@
 
         .sidebar .nav-link:hover,
         .sidebar .nav-link.active {
-        background-color: rgba(255, 255, 255, 0.2);
-        padding-left: 25px;
-        color: #fff;
-        text-decoration: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding-left: 25px;
+            color: #fff;
+            text-decoration: none;
         }
 
         .sidebar-header h4 {
@@ -67,16 +71,18 @@
 
         .report-link {
             display: flex;
-            align-items: center; /* Center the icon and text vertically */
+            align-items: center;
+            /* Center the icon and text vertically */
             margin-left: 5px;
         }
 
         .report-text {
-            margin-left: 5px; 
+            margin-left: 5px;
         }
 
         .dashboard-header {
-            margin-left: 270px; /* Adjusted for sidebar */
+            margin-left: 270px;
+            /* Adjusted for sidebar */
             padding: 20px;
             background-color: #fff;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -89,7 +95,8 @@
         }
 
         .patient-detail-container {
-            margin-left: 270px; /* Adjusted for sidebar */
+            margin-left: 270px;
+            /* Adjusted for sidebar */
             padding: 20px;
         }
 
@@ -99,8 +106,10 @@
 
         .patient-info .row {
             display: flex;
-            justify-content: center; /* Center the content horizontally */
-            align-items: center; /* Center the content vertically */
+            justify-content: center;
+            /* Center the content horizontally */
+            align-items: center;
+            /* Center the content vertically */
         }
 
         .patient-info .text-center {
@@ -110,32 +119,38 @@
         .patient-info .patient-name {
             font-size: 36px;
             font-weight: bold;
-            margin-top: 15px;  /* Adds space between the image and the name */
+            margin-top: 15px;
+            /* Adds space between the image and the name */
         }
 
         .patient-info img {
-            width: 100%; /* Make the image take the full width of its container */
-            max-width: 250px; /* Maximum width of the image */
-            height: auto; /* Auto height to maintain aspect ratio */
+            width: 100%;
+            /* Make the image take the full width of its container */
+            max-width: 250px;
+            /* Maximum width of the image */
+            height: auto;
+            /* Auto height to maintain aspect ratio */
             border-radius: 50%;
-            object-fit: cover; /* Ensure image doesn't get distorted */
+            object-fit: cover;
+            /* Ensure image doesn't get distorted */
             margin-left: 120px;
         }
 
         .patient-name-age {
             font-weight: bold;
-            text-align: left; /* Align name and age to the left */
+            text-align: left;
+            /* Align name and age to the left */
             margin-top: 10px;
         }
 
         .patient-name {
             font-size: 36px;
-            margin-left:80px;
+            margin-left: 80px;
         }
 
         .patient-age {
             font-size: 24px;
-            margin-left:170px;
+            margin-left: 170px;
         }
 
         .field-label {
@@ -151,7 +166,8 @@
         }
 
         .row {
-            margin-bottom: 10px; /* Reducing space between fields */
+            margin-bottom: 10px;
+            /* Reducing space between fields */
         }
 
         .field {
@@ -163,7 +179,8 @@
             display: inline-block;
             font-weight: bold;
             margin-right: 10px;
-            font-size: 28px;  /* Make the font bigger */
+            font-size: 28px;
+            /* Make the font bigger */
         }
 
         /* Styling for the field values */
@@ -184,37 +201,43 @@
         }
 
         .status-box.critical {
-            background-color: #FF4C4C;  /* Highlighter Red */
+            background-color: #FF4C4C;
+            /* Highlighter Red */
         }
 
         .status-box.warning {
-            background-color: #FFEB3B;  /* Highlighter Yellow */
+            background-color: #FFEB3B;
+            /* Highlighter Yellow */
         }
 
         .status-box.stable {
-            background-color: #03ff4f;  /* Highlighter Green */
+            background-color: #03ff4f;
+            /* Highlighter Green */
             color: #333;
         }
 
         .status-box.recovered {
-            background-color: #29B6F6;  /* Highlighter Blue */
+            background-color: #29B6F6;
+            /* Highlighter Blue */
         }
-        
+
         .status-box:hover {
-            transform: scale(1.1);  
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
         /* Field container styling */
         .field {
-            margin-bottom: 15px;  /* Add spacing between the fields */
+            margin-bottom: 15px;
+            /* Add spacing between the fields */
         }
 
         .patient-details {
-            margin-left: 20px; /* Adjusting the space between the image and the text */
+            margin-left: 20px;
+            /* Adjusting the space between the image and the text */
         }
 
-        
+
         .table {
             background-color: white;
             border-radius: 6px;
@@ -224,42 +247,44 @@
 
         /* Gradient effect on hover for rows */
         .table tbody tr {
-        transition: background-color 0.3s ease, transform 0.5s ease;
+            transition: background-color 0.3s ease, transform 0.5s ease;
         }
 
         .table tbody tr:hover {
-        background: linear-gradient(90deg, #a988cc 0%, #a6c6fc 100%);
-        transform: translateX(5px);
+            background: linear-gradient(90deg, #a988cc 0%, #a6c6fc 100%);
+            transform: translateX(5px);
         }
 
         /* Slide-in animation for rows */
         .table tbody tr {
-        opacity: 0;
-        transform: translateX(-100px);
-        animation: slideIn 0.5s forwards;
+            opacity: 0;
+            transform: translateX(-100px);
+            animation: slideIn 0.5s forwards;
         }
 
         @keyframes slideIn {
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .table th{
+        .table th {
             background-color: #c0ddff;
         }
 
         /* Glow and shadow effect on cell hover */
-        .table td, .table th {
-        padding: 10px;
-        text-align: center;
-        transition: all 0.3s ease;
+        .table td,
+        .table th {
+            padding: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
-        .table td:hover, .table th:hover {
-        box-shadow: 0 0 10px rgba(78, 115, 223, 0.6);
-        text-shadow: 0 0 8px rgba(78, 115, 223, 0.8);
+        .table td:hover,
+        .table th:hover {
+            box-shadow: 0 0 10px rgba(78, 115, 223, 0.6);
+            text-shadow: 0 0 8px rgba(78, 115, 223, 0.8);
         }
 
         /* Fullscreen vs non-fullscreen layout adjustments */
@@ -273,9 +298,10 @@
             margin-bottom: 20px;
         }
 
-        .not-fullscreen .patient-name{
+        .not-fullscreen .patient-name {
             margin-left: 0px !important;
         }
+
         .not-fullscreen .patient-age {
             margin-left: 30px !important;
         }
@@ -302,175 +328,350 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        /* /// */
+
+        .chart-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
+
+        .chart-container {
+            display: none;
+        }
+
+        .chart-container.active {
+            display: block;
+
+        }
+
+        .chart-container canvas {
+            max-height: 300px;
+            /* 建议不要超过 300~350px */
+            width: 100%;
+        }
+
+        .tabs button {
+            border: none;
+            background-color: #f1f1f1;
+            padding: 8px 16px;
+            margin-right: 5px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .tabs button:hover,
+        .tabs button.active-tab {
+            background-color: #007bff;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-header text-center">
-        <h4><i class="fas fa-stethoscope me-2"></i> Doctor Panel</h4>
-      </div>
-      <ul class="nav flex-column">
-        <li class="nav-item"><a href="doc_dashboard.html" class="nav-link"><i class="fas fa-th-large me-2"></i><span> Dashboard</span></a></li>
-        <li class="nav-item"><a href="doc_addpatient.html" class="nav-link"><i class="fas fa-user-plus me-2"></i><span> Add Patient</span></a></li>
-        <li class="nav-item"><a href="doc_patientlist.html" class="nav-link"><i class="fas fa-users"></i><span> Patient List</span></a></li>
-        <li class="nav-item"><a href="#patientSubmenu" class="nav-link active" data-bs-toggle="collapse"><i class="fas fa-syringe"></i><span> Patient</span><i class="fas fa-chevron-down float-end"></i></a></li>
-    <div class="collapse" id="patientSubmenu">
-        <li class="nav-item"><a href="doc_importdata.html" class="nav-link"><i class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a></li>
-        <li class="nav-item"><a href="doc_recommendation.html" class="nav-link"><i class="fas fa-bolt"></i><span> Recommendation</span></a></li>
-        <li class="nav-item"><a href="doc_graphexp.html" class="nav-link"><i class="fas fa-chart-line"></i><span> Graph Explorer</span></a></li>
-        <li class="nav-item"><a href="doc_algorithm.html" class="nav-link"><i class="fas fa-cogs"></i><span> Algorithm Runner</span></a></li>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header text-center">
+            <h4><i class="fas fa-stethoscope me-2"></i> Doctor Panel</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a href="doc_dashboard.html" class="nav-link"><i
+                        class="fas fa-th-large me-2"></i><span> Dashboard</span></a></li>
+            <li class="nav-item"><a href="doc_addpatient.html" class="nav-link"><i
+                        class="fas fa-user-plus me-2"></i><span> Add Patient</span></a></li>
+            <li class="nav-item"><a href="doc_patientlist.html" class="nav-link"><i class="fas fa-users"></i><span>
+                        Patient List</span></a></li>
+            <li class="nav-item"><a href="#patientSubmenu" class="nav-link active" data-bs-toggle="collapse"><i
+                        class="fas fa-syringe"></i><span> Patient</span><i
+                        class="fas fa-chevron-down float-end"></i></a></li>
+            <div class="collapse" id="patientSubmenu">
+                <li class="nav-item"><a href="doc_importdata.html" class="nav-link"><i
+                            class="fas fa-cloud-upload-alt"></i><span> Import Data</span></a></li>
+                <li class="nav-item"><a href="doc_recommendation.html" class="nav-link"><i
+                            class="fas fa-bolt"></i><span> Recommendation</span></a></li>
+                <li class="nav-item"><a href="doc_graphexp.html" class="nav-link"><i
+                            class="fas fa-chart-line"></i><span> Graph Explorer</span></a></li>
+                <li class="nav-item"><a href="doc_algorithm.html" class="nav-link"><i class="fas fa-cogs"></i><span>
+                            Algorithm Runner</span></a></li>
+            </div>
+            <li class="nav-item"><a href="doc_reports.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span>
+                        Reports</span></a></li>
+            <li class="nav-item"><a href="doc_userprofile.html" class="nav-link"><i
+                        class="fas fa-user-circle"></i><span> View Profile</span></a></li>
     </div>
-    <li class="nav-item"><a href="doc_reports.html" class="nav-link"><i class="fas fa-clipboard-list"></i><span> Reports</span></a></li>
-    <li class="nav-item"><a href="doc_userprofile.html" class="nav-link"><i class="fas fa-user-circle"></i><span> View Profile</span></a></li>
-</div>
 
-<!-- Profile Dropdown (Top Right) -->
-<div class="profile-dropdown position-absolute" style="top: 10px; right: 30px;">
-  <div class="dropdown">
-    <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fas fa-user-circle"></i>
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li><a class="dropdown-item" href="doc_userprofile.html">View Profile</a></li>
-        <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
-    </ul>
-  </div>
-</div>
+    <!-- Profile Dropdown (Top Right) -->
+    <div class="profile-dropdown position-absolute" style="top: 10px; right: 30px;">
+        <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="fas fa-user-circle"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="doc_userprofile.html">View Profile</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>
+                        Logout</a></li>
+            </ul>
+        </div>
+    </div>
 
-<!-- Main Content -->
-<div class="dashboard-header">
-    <h1><a href="doc_patientlist.html" class="text-decoration-none">Patient</a> > {{ patient[2] }}</h1>
-</div>
+    <!-- Main Content -->
+    <div class="dashboard-header">
+        <h1><a href="doc_patientlist.html" class="text-decoration-none">Patient</a> > {{ patient['full_name'] }}</h1>
+    </div>
 
-<!-- Patient Image and Info (Gender, Birthday, Phone Number, Address) in one row -->
+    <!-- Patient Image and Info (Gender, Birthday, Phone Number, Address) in one row -->
     <div class="patient-detail-container">
         <div class="patient-info">
             <div class="row">
                 <div class="col-md-4">
-                    <img src="https://www.pngmart.com/files/23/Profile-PNG-Photo.png" alt="Patient Image" class="img-fluid patient-image">
-                    <h2 class="patient-name">{{ patient[2] }}</h2> <!-- Patient Full Name -->
+                    <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Patient Image"
+                        class="img-fluid patient-image">
+                    <h2 class="patient-name">{{ patient['full_name'] }}</h2> <!-- Patient Full Name -->
                 </div>
                 <div class="col-md-8">
                     <!-- Gender -->
                     <div class="field">
                         <span class="field-label">Gender:</span>
-                        <span class="field-value">{{ patient[4] }}</span>
+                        <span class="field-value">{{ patient['gender'] }}</span>
                     </div>
                     <!-- Birthday -->
                     <div class="field">
                         <span class="field-label">Birthday:</span>
-                        <span class="field-value">{{ patient[3] }}</span>
+                        <span class="field-value">{{ patient['dob'] }}</span>
                     </div>
                     <!-- Status -->
                     <div class="field">
                         <span class="field-label">Status:</span>
-                        <span class="status-box {{ patient[6] | lower }}">{{ patient[6] }}</span>
+                        <span class="status-box {{ patient['status'] | lower }}">{{ patient['status'] }}</span>
                     </div>
                 </div>
             </div>
-        </div>        
+        </div>
 
-<h3>Health Data</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th>CGM Level</th>
-            <th>Blood Pressure</th>
-            <th>Heart Rate</th>
-            <th>Cholesterol</th>
-            <th>Insulin Intake</th>
-            <th>Food Intake</th>
-            <th>Activity Level</th>
-            <th>Weight</th>
-            <th>HbA1c</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in health_data %}
-        <tr>
-            <td>{{ data[2] }}</td> <!-- Timestamp -->
-            <td>{{ data[3] }}</td> <!-- CGM Level -->
-            <td>{{ data[4] }}</td> <!-- Blood Pressure -->
-            <td>{{ data[5] }}</td> <!-- Heart Rate -->
-            <td>{{ data[6] }}</td> <!-- Cholesterol -->
-            <td>{{ data[7] }}</td> <!-- Insulin Intake -->
-            <td>{{ data[8] }}</td> <!-- Food Intake -->
-            <td>{{ data[9] }}</td> <!-- Activity Level -->
-            <td>{{ data[10] }}</td> <!-- Weight -->
-            <td>{{ data[11] }}</td> <!-- HbA1c -->
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-        
+        <h3>Health Data</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>CGM Level</th>
+                    <th>Blood Pressure</th>
+                    <th>Heart Rate</th>
+                    <th>Cholesterol</th>
+                    <th>Insulin Intake</th>
+                    <th>Food Intake</th>
+                    <th>Activity Level</th>
+                    <th>Weight</th>
+                    <th>HbA1c</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in health_data %}
+                <tr>
+                    <td>{{ data['timestamp'] }}</td>
+                    <td>{{ data['cgm_level'] }}</td>
+                    <td>{{ data['blood_pressure'] }}</td>
+                    <td>{{ data['heart_rate'] }}</td>
+                    <td>{{ data['cholesterol'] }}</td>
+                    <td>{{ data['insulin_intake'] }}</td>
+                    <td>{{ data['food_intake'] }}</td>
+                    <td>{{ data['activity_level'] }}</td>
+                    <td>{{ data['weight'] }}</td>
+                    <td>{{ data['hb1ac'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Recent Labs -->
-    <div class="recent-labs">
-        <h2>Recent Labs</h2>
-        <div class="card p-3">
-            <ul>
-                <li><strong>X-RAY:</strong> Jane Smith | 04/04/2025</li>
-                <li><strong>Nasal Endoscopy:</strong> 04/04/2025</li>
-            </ul>
+        <div class="chart-section">
+            <label for="timestampSelect" class="field-label">Health Monitoring Dashboard</label>
+            <div class="tabs">
+
+                <button onclick="switchTab('cgm')">CGM Level</button>
+                <button onclick="switchTab('bp')">Blood Pressure</button>
+                <button onclick="switchTab('hr')">Heart Rate</button>
+                <button onclick="switchTab('cholesterol')">Cholesterol</button>
+                <button onclick="switchTab('insulin')">Insulin Intake</button>
+                <button onclick="switchTab('weight')">Weight</button>
+                <button onclick="switchTab('hb1ac')">HbA1c</button>
+            </div>
+
+            <div id="cgm" class="chart-container active"><canvas id="cgmChart"></canvas></div>
+            <div id="bp" class="chart-container"><canvas id="bpChart"></canvas></div>
+            <div id="hr" class="chart-container"><canvas id="hrChart"></canvas></div>
+            <div id="cholesterol" class="chart-container"><canvas id="cholesterolChart"></canvas></div>
+            <div id="insulin" class="chart-container"><canvas id="insulinChart"></canvas></div>
+            <div id="weight" class="chart-container"><canvas id="weightChart"></canvas></div>
+            <div id="hb1ac" class="chart-container"><canvas id="hb1acChart"></canvas></div>
+
+            <!-- Back Button -->
+            <div class="mt-4">
+                <a href="doc_patientlist.html" class="back-button">Back to Patient List</a>
+            </div>
         </div>
     </div>
 
-    <!-- Knowledge Graph & Recommendations -->
-    <div class="knowledge-graph">
-        <h2>Knowledge Graph & Recommendations</h2>
-        <div class="card p-3">
-            <ul>
-                <li>Recommendation 1</li>
-                <li>Recommendation 2</li>
-                <li>Recommendation 3</li>
-            </ul>
-        </div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Back Button -->
-    <div class="mt-4">
-        <a href="doc_patientlist.html" class="back-button">Back to Patient List</a>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // JavaScript to check window size and detect fullscreen
-    function checkWindowSize() {
-        const body = document.body;
-        if (window.innerWidth < window.outerWidth) {
-            body.classList.add("not-fullscreen");  // If window is not maximized
-        } else {
-            body.classList.remove("not-fullscreen");  // If window is fullscreen
+    <script>
+        // JavaScript to check window size and detect fullscreen
+        function checkWindowSize() {
+            const body = document.body;
+            if (window.innerWidth < window.outerWidth) {
+                body.classList.add("not-fullscreen");  // If window is not maximized
+            } else {
+                body.classList.remove("not-fullscreen");  // If window is fullscreen
+            }
         }
-    }
 
-    // Check on load and on window resize
-    window.addEventListener("load", checkWindowSize);
-    window.addEventListener("resize", checkWindowSize);
+        // Check on load and on window resize
+        window.addEventListener("load", checkWindowSize);
+        window.addEventListener("resize", checkWindowSize);
 
-    // Toggle Patient List submenu
-    document.getElementById("patientListLink").addEventListener("click", function (e) {
+        // Toggle Patient List submenu
+        document.getElementById("patientListLink").addEventListener("click", function (e) {
             e.preventDefault();
             const group = document.querySelector(".sidebar-link-group");
             group.style.display = group.style.display === "block" ? "none" : "block";
         });
 
-    // Add this JavaScript to handle the 'active' class toggle
-    const links = document.querySelectorAll('.sidebar a');
+        // Add this JavaScript to handle the 'active' class toggle
+        const links = document.querySelectorAll('.sidebar a');
 
-    links.forEach(link => {
-        link.addEventListener('click', function() {
-            links.forEach(link => link.classList.remove('active')); // Remove active class from all links
-            this.classList.add('active'); // Add active class to clicked link
+        links.forEach(link => {
+            link.addEventListener('click', function () {
+                links.forEach(link => link.classList.remove('active')); // Remove active class from all links
+                this.classList.add('active'); // Add active class to clicked link
+            });
         });
-    });
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.chart-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        }
+        function parseBP(bp) {
+            if (!bp) return 0;
+            const parts = bp.split('/');
+            return parseInt(parts[0]);
+        }
+
+        function updateChart(chart, labels, values, label) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = values;
+            chart.data.datasets[0].label = label;
+            chart.update();
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const patientId = "{{ patient_id }}";
+            console.log("patientId = ", patientId);  // ✅
+
+
+            function createStyledChart(canvasId, label, colorRGB) {
+                const borderColor = `rgba(${colorRGB}, 0.9)`;
+                const bgColor = `rgba(${colorRGB}, 0.05)`;
+                const pointBorder = `rgba(${colorRGB}, 1)`;
+
+                return new Chart(document.getElementById(canvasId), {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: label,
+                            data: [],
+                            borderColor: borderColor,
+                            backgroundColor: bgColor,
+                            borderWidth: 3,
+                            pointBackgroundColor: 'white',
+                            pointBorderColor: pointBorder,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#f9f9f9',
+                                titleColor: '#333',
+                                bodyColor: '#666',
+                                borderColor: '#ccc',
+                                borderWidth: 1
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: {
+                                    font: { size: 12 },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: { size: 12 },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    color: '#eee'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const cgmChart = createStyledChart('cgmChart', 'CGM Level', '0, 123, 255');        // 蓝
+            const bpChart = createStyledChart('bpChart', 'Systolic BP', '108, 117, 125');      // 灰
+            const hrChart = createStyledChart('hrChart', 'Heart Rate', '220, 53, 69');         // 红
+            const cholesterolChart = createStyledChart('cholesterolChart', 'Cholesterol', '40, 167, 69'); // 绿
+            const insulinChart = createStyledChart('insulinChart', 'Insulin Intake', '111, 66, 193');     // 紫
+            const weightChart = createStyledChart('weightChart', 'Weight', '255, 159, 64');    // 橙
+            const hb1acChart = createStyledChart('hb1acChart', 'HbA1c', '121, 85, 72');        // 棕
+
+
+
+            function fetchAndRenderPatientCharts() {
+                fetch(`/get_patient_data/${patientId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const labels = data.map(item => item.timestamp);
+                        updateChart(cgmChart, labels, data.map(i => i.cgm_level), 'CGM Level');
+                        updateChart(bpChart, labels, data.map(i => parseBP(i.blood_pressure)), 'Systolic BP');
+                        updateChart(hrChart, labels, data.map(i => i.heart_rate), 'Heart Rate');
+                        updateChart(cholesterolChart, labels, data.map(i => i.cholesterol), 'Cholesterol');
+                        updateChart(insulinChart, labels, data.map(i => i.insulin_intake), 'Insulin');
+                        updateChart(weightChart, labels, data.map(i => i.weight), 'Weight');
+                        updateChart(hb1acChart, labels, data.map(i => i.hb1ac), 'HbA1c');
+                    });
+            }
+
+            fetchAndRenderPatientCharts();
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

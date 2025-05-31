@@ -11,10 +11,20 @@ from pymysql.cursors import DictCursor  # Import DictCursor
 import google.generativeai as genai
 import os
 
-from sqlalchemy import text
+
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from collections import defaultdict
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from sqlalchemy import text
+import random
+import string
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 
 # *****Security audit *****
 from zapv2 import ZAPv2
@@ -28,7 +38,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import DataRequired
 
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 # Enable CSRF protection
 csrf = CSRFProtect(app)
 app.secret_key = 'password'  # Secure the session with a secret key
@@ -38,7 +50,6 @@ app.config.update(
     SESSION_COOKIE_DOMAIN=None,   # Avoid domain mismatch
 )
 app.config['SESSION_TYPE'] = 'filesystem'
-
 
 # ✅ NEW: Add SQLAlchemy MySQL config
 app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -84,13 +95,113 @@ class HealthData(db.Model):
     weight = db.Column(db.Float)
     hb1ac = db.Column(db.Float)
 
-        # API 路由：提供给前端使用
+class Patient(db.Model):
+    __tablename__ = 'patients'
+
+    patient_id = db.Column(db.Integer, primary_key=True)
+    doctor_id = db.Column(db.Integer)
+    full_name = db.Column(db.String(100))
+    dob = db.Column(db.Date)
+    gender = db.Column(db.String(10))
+    created_at = db.Column(db.DateTime)
+    status = db.Column(db.String(20))
+
+# ✅ Generate temporary password
+def generate_temp_password(length=8):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+
+# ✅ Send email
+def send_email_with_temp_password(email, html_content):
+    try:
+        sender = "supercleanzsystem@gmail.com"
+        app_password = "seah kfro xmup zwwf"
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "Reset Password"
+        msg["From"] = sender
+        msg["To"] = email
+        msg.attach(MIMEText(html_content, "html"))
+
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+        server.login(sender, app_password)
+        server.sendmail(sender, email, msg.as_string())
+        server.quit()
+        print(f"✅ Email successfully sent to: {email}")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send email to {email}: {e}")
+        return False
+
+# ✅ Forgot password API
+@app.route('/forgot_password', methods=['POST'])
+@csrf.exempt
+def forgot_password():
+    try:
+        # ✅ 强制获取 JSON 数据，避免返回 None
+        data = request.get_json(force=True)
+        print("[DEBUG] JSON payload:", data)
+
+        email = data.get('email')
+        if not email:
+            return jsonify({'success': False, 'message': 'Missing email'}), 400
+
+        # ✅ 数据库查询
+        result = db.session.execute(
+            text("SELECT user_id, username FROM users WHERE LOWER(email) = LOWER(:email)"),
+            {"email": email}
+        ).fetchone()
+
+        if not result:
+            return jsonify({'success': False, 'message': 'Email not found.'}), 404
+
+        user_id = result.user_id
+        username = result.username
+        new_password = generate_temp_password(10)
+
+        db.session.execute(
+            text("UPDATE users SET password_hash = :pw WHERE user_id = :uid"),
+            {"pw": new_password, "uid": user_id}
+        )
+        db.session.commit()
+
+        html_content = f"""
+            <h3>Password Reset</h3>
+            <p>Hi <b>{username}</b>,</p>
+            <p>Your new temporary password is:</p>
+            <p style="font-size: 18px; color: #2c3e50;"><b>{new_password}</b></p>
+            <p>Please log in using this password and <b>change it immediately</b> after login.</p>
+            <br>
+            <p>Regards,<br>Health Track Pro Team</p>
+        """
+
+        if send_email_with_temp_password(email, html_content):
+            return jsonify({'success': True, 'message': 'A new password has been sent to your email.'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to send email. Try again later.'}), 500
+
+    except Exception as e:
+        print("[ERROR] forgot_password:", e)
+        return jsonify({'success': False, 'message': 'Server error'}), 500
+
+
+
+# API 路由：提供给前端使用
 @app.route('/get_patient_data/<int:patient_id>')
 def get_patient_data(patient_id):
-    records = HealthData.query.filter_by(patient_id=patient_id).order_by(HealthData.timestamp).all()
+    records = HealthData.query.filter_by(patient_id=patient_id).all()
+
+    # ✅ 先解析时间后排序（确保顺序是升序）
+    def parse_datetime(r):
+        try:
+            return datetime.strptime(r.timestamp.strip(), '%d/%m/%Y %H:%M')
+        except:
+            return datetime.min
+
+    sorted_records = sorted(records, key=parse_datetime)
+
     return jsonify([
         {
-           'timestamp': r.timestamp,
+            'timestamp': r.timestamp,
             'cgm_level': r.cgm_level,
             'blood_pressure': r.blood_pressure,
             'heart_rate': r.heart_rate,
@@ -98,7 +209,7 @@ def get_patient_data(patient_id):
             'insulin_intake': r.insulin_intake,
             'weight': r.weight,
             'hb1ac': r.hb1ac
-        } for r in records
+        } for r in sorted_records
     ])
 
 # Check if running in ZAP test mode (you'll set this env var when running for ZAP)
@@ -368,23 +479,26 @@ def dashboard_page():
 
         avg_cgm_level = cursor.fetchone()['avg_cgm'] or 0
 
+        
+
+
     except pymysql.MySQLError as e:
         flash(f"Database error: {e}")
         return redirect('/login')
-
     finally:
         if conn:
             conn.close()
 
     return render_template("doc_dashboard.html",
-                        doctor=doctor,
-                        patients=patients,
-                        total_patients=total_patients,
-                        chart_data=chart_data,
-                        new_patients_7_days=new_patients_7_days,
-                        new_patients_30_days=new_patients_30_days,
-                        avg_cgm_level=avg_cgm_level)
-    
+                           doctor=doctor,
+                           patients=patients,
+                           total_patients=total_patients,
+                           chart_data=chart_data,
+                           new_patients_7_days=new_patients_7_days,
+                           new_patients_30_days=new_patients_30_days,
+                           avg_cgm_level=avg_cgm_level)
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -496,6 +610,7 @@ def login():
 
     # --- Phase 4: Render login form ---
     return render_template('login.html', form=form)
+
 
 @app.route('/doc_addpatient.html', methods=['GET', 'POST'])
 def add_patient_page():
