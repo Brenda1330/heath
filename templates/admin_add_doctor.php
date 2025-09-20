@@ -23,8 +23,8 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' https://c
 // Config (change to fit your env)
 // -------------------------
 $DB_DSN = 'mysql:host=localhost;dbname=your_db;charset=utf8mb4';
-$DB_USER = 'your_user';
-$DB_PASS = 'your_pass';
+$DB_USER = 'localhost';
+$DB_PASS = 'password';
 
 // File upload settings
 $UPLOAD_DIR = __DIR__ . '/../uploads/doctor_photos'; // recommended: outside webroot or protected directory
@@ -273,3 +273,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </script>
 </body>
 </html>
+
