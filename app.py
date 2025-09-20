@@ -7,7 +7,7 @@ from io import BytesIO, StringIO
 from datetime import timedelta, datetime
 import traceback
 import pymysql
-from pymysql.cursors import DictCursor  # Import DictCursor
+from pymysql.cursors import DictCursor  # Import DictCursor for cursor
 import google.generativeai as genai
 import os
 
