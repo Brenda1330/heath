@@ -1081,6 +1081,15 @@
         align-items: center;
     }
 
+    .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+    background-color: #f1f5f9; /* Light grey/blue hover effect */
+}
+
     /* === PROFESSIONAL TABLE STYLES - UNIQUE CLASSES === */
 .pro-table-container {
     margin-left: 270px;
