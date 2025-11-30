@@ -11,6 +11,19 @@ include 'templates/header_doctor.php';
 include 'templates/sidebar_doctor.php';
 ?>
 
+<!-- Profile Dropdown (Top Right) -->
+<div class="profile-dropdown">
+    <div class="dropdown">
+        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="doc_userprofile.php">View Profile</a></li>
+            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+        </ul>
+    </div>
+</div>
+
 <div class="main-content">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -20,7 +33,13 @@ include 'templates/sidebar_doctor.php';
     </div>
     <div class="text-end">
         <span class="badge bg-secondary fs-6">Rule-Based Analysis</span>
-        <small class="d-block text-muted">Last updated: <?php echo date('M j, Y g:i A'); ?></small>
+        <small class="d-block text-muted">Last updated: 
+            <?php 
+                // Create a DateTime object for "now" in the Malaysia timezone
+                $now = new DateTime("now", new DateTimeZone('Asia/Kuala_Lumpur'));
+                echo $now->format('M j, Y g:i A'); 
+            ?>
+        </small>
     </div>
 </div>
 
