@@ -29,7 +29,18 @@
                 });
             });
         }
-        
+
+         const clickableRows = document.querySelectorAll('.clickable-row');
+    
+        clickableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                const url = this.getAttribute('data-href');
+                if (url) {
+                    window.location.href = url;
+                }
+            });
+        });
+
         // --- Health Status Pie Chart ---
         const chartData = <?php echo json_encode($chart_data ?? [0,0,0,0]); ?>;
         const ctx = document.getElementById('healthStatusChart');
