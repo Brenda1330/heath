@@ -154,85 +154,50 @@
             const metricSelect = document.getElementById('metricSelect');
             let patientChart = null;
 
-            // FIXED: Robust timestamp parsing for multiple formats
             // FIXED: Robust timestamp parsing that handles single and double digits
-            const parseTimestamp = (timestamp) => {
+            const parseTimestampToUTC = (timestamp) => {
                 if (!timestamp) return null;
-                
-                console.log('Parsing timestamp:', timestamp); // Debug
-                
-                // Format 1: "DD/MM/YYYY HH:MM" with flexible digit counts
-                const parts1 = timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2})/);
-                if (parts1) {
-                    // Pad single digits with leading zeros
-                    const day = parts1[1].padStart(2, '0');
-                    const month = parts1[2].padStart(2, '0');
-                    const hour = parts1[4].padStart(2, '0');
-                    
-                    // Create ISO format: "YYYY-MM-DDTHH:MM:SS"
-                    const isoString = `${parts1[3]}-${month}-${day}T${hour}:${parts1[5]}:00`;
-                    const date = new Date(isoString);
-                    
-                    if (date instanceof Date && !isNaN(date)) {
-                        console.log('Successfully parsed with Format 1:', isoString, date);
-                        return date;
-                    }
+                // Expecting: DD/MM/YYYY HH:MM (e.g., 19/11/2025 12:24)
+                const parts = timestamp.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s(\d{1,2}):(\d{2})/);
+                if (parts) {
+                    // Create Date using Date.UTC to avoid local browser timezone interference
+                    // Date.UTC(year, monthIndex, day, hour, minute)
+                    return new Date(Date.UTC(
+                        parts[3],           // Year
+                        parts[2] - 1,       // Month (0-indexed)
+                        parts[1],           // Day
+                        parts[4],           // Hour
+                        parts[5]            // Minute
+                    ));
                 }
-                
-                // Format 2: Try direct parsing as fallback
-                const date = new Date(timestamp);
-                if (date instanceof Date && !isNaN(date)) {
-                    console.log('Successfully parsed with direct parsing:', date);
-                    return date;
-                }
-                
-                console.log('Failed to parse timestamp:', timestamp);
-                return null;
-            };
-                        // FIXED: Data preparation with validation
-            const prepareChartData = () => {
-                return healthDataForChart
-                    .map(item => {
-                        const parsedTime = parseTimestamp(item.timestamp);
-                        return {
-                            ...item,
-                            parsedTime: parsedTime,
-                            cgm_level: parseFloat(item.cgm_level) || null,
-                            food_intake: item.food_intake || 'N/A',
-                            activity_level: item.activity_level || 'N/A'
-                        };
-                    })
-                    .filter(item => item.parsedTime !== null) // Remove invalid dates
-                    .sort((a, b) => a.parsedTime - b.parsedTime); // Sort by date
+                // Fallback
+                return new Date(timestamp);
             };
 
-            const chartData = prepareChartData();
-            
-            console.log('Prepared chart data:', chartData); // Debug
-
-            // Show warning if no valid data
-            if (chartData.length === 0) {
-                chartCanvas.closest('.chart-container').innerHTML = 
-                    '<div class="alert alert-warning">No valid date data available for chart.</div>';
-                return;
-            }
+            const chartData = healthDataForChart.slice().reverse().map(item => {
+                return {
+                    ...item,
+                    parsedTime: parseTimestampToUTC(item.timestamp),
+                    cgm_level: parseFloat(item.cgm_level) || null,
+                    hb1ac: parseFloat(item.hb1ac) || null,
+                    heart_rate: parseFloat(item.heart_rate) || null,
+                    weight: parseFloat(item.weight) || null
+                };
+            }).filter(item => item.parsedTime && !isNaN(item.parsedTime));
 
             const createOrUpdateChart = (metricKey) => {
-            const labels = chartData.map(item => {
-                const date = item.parsedTime;
-                if (!date) return 'Unknown';
-
-                // Force conversion to Malaysia Time (UTC+8) regardless of browser location
-                return date.toLocaleString('en-GB', {
-                    timeZone: 'Asia/Kuala_Lumpur',
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false // Change to true if you want AM/PM
+                // Convert the UTC dates to Malaysia Time strings for the labels
+                const labels = chartData.map(item => {
+                    return item.parsedTime.toLocaleString('en-GB', {
+                        timeZone: 'Asia/Kuala_Lumpur',
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false // 24-hour format
+                    });
                 });
-            });
                     let yAxisLabel = 'Value';
                     if (metricKey === 'cgm_level') yAxisLabel = 'CGM Level (mmol/L)';
                     else if (metricKey === 'hb1ac') yAxisLabel = 'HbA1c (%)';
