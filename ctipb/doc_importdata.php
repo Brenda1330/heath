@@ -36,28 +36,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_data'])
     }
 
     // Timestamp validation - FIXED: Convert to UTC for database, validate in Malaysia time
+    // Timestamp validation
     if (empty(trim($_POST['timestamp']))) {
         $field_errors['timestamp'] = 'Please enter a valid timestamp';
     } else {
-        // Validate the timestamp format (d/m/Y G:i) in Malaysia timezone
-        $timestamp = $_POST['timestamp'];
+        $timestamp_input = $_POST['timestamp'];
         $malaysia_tz = new DateTimeZone('Asia/Kuala_Lumpur');
-        $date_obj = DateTime::createFromFormat('d/m/Y G:i', $timestamp, $malaysia_tz);
-        
-        if (!$date_obj || $date_obj->format('d/m/Y G:i') !== $timestamp) {
-            $field_errors['timestamp'] = 'Use format DD/MM/YYYY HH:MM (e.g., 25/11/2025 8:30)';
-        } else {
-            // Check if date is not in the future (with 5 minutes tolerance for time sync issues)
-            $now = new DateTime('now', $malaysia_tz);
-            $future_limit = (clone $now)->modify('+5 minutes'); // Allow 5 minutes tolerance
-            
-            if ($date_obj > $future_limit) {
-                $field_errors['timestamp'] = 'Timestamp cannot be more than 5 minutes in the future. Please check your device time.';
+        $date_obj = false;
+
+        // 1. Try Strict Format (d/m/Y H:i) - Matches Flatpickr default
+        $date_obj = DateTime::createFromFormat('d/m/Y H:i', $timestamp_input, $malaysia_tz);
+
+        // 2. If strict fails, try flexible parsing
+        if (!$date_obj) {
+            // Replace slashes with dashes to help strtotime if needed, or just try direct
+            // Note: strtotime assumes American M/D/Y with slashes, so we must be careful.
+            // We force European/Australian d-m-Y if slashes are used by replacing them.
+            $clean_ts = str_replace('/', '-', $timestamp_input); 
+            if (($timestamp = strtotime($clean_ts)) !== false) {
+                $date_obj = new DateTime();
+                $date_obj->setTimestamp($timestamp);
+                $date_obj->setTimezone($malaysia_tz);
             }
-            // Check if date is not too far in the past (optional: last 30 days)
+        }
+
+        if (!$date_obj) {
+            $field_errors['timestamp'] = 'Invalid format. Please use the calendar picker.';
+        } else {
+            // Check constraints
+            $now = new DateTime('now', $malaysia_tz);
+            // Allow a small buffer for "future" times due to server clock differences
+            $future_limit = (clone $now)->modify('+10 minutes'); 
             $thirty_days_ago = (new DateTime('now', $malaysia_tz))->modify('-30 days');
-            if ($date_obj < $thirty_days_ago) {
+
+            if ($date_obj > $future_limit) {
+                $field_errors['timestamp'] = 'Timestamp cannot be in the future.';
+            } elseif ($date_obj < $thirty_days_ago) {
                 $field_errors['timestamp'] = 'Timestamp cannot be older than 30 days';
+            } else {
+                // SUCCESS: Reformat to standard DB format
+                // This ensures what goes into the DB is always clean 'd/m/Y H:i'
+                $_POST['timestamp'] = $date_obj->format('d/m/Y H:i');
             }
         }
     }
