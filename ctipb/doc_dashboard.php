@@ -248,7 +248,8 @@ include 'templates/sidebar_doctor.php';
             <tbody>
                 <?php if (!empty($patients)): ?>
                     <?php foreach ($patients as $patient): ?>
-                        <tr>
+                        <!-- ADDED: data-href attribute and 'clickable-row' class -->
+                        <tr class="clickable-row" data-href="doc_patientdetail.php?patient_id=<?php echo htmlspecialchars($patient['patient_id']); ?>">
                             <td><?php echo htmlspecialchars($patient['full_name'] ?? 'N/A'); ?></td>
                             <td><?php echo htmlspecialchars($patient['cgm_level'] ?? 'N/A'); ?></td>
                             <td>
